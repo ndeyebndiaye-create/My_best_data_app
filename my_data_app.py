@@ -6,7 +6,7 @@ import time
 
 # Configuration de la page
 st.set_page_config(
-    page_title="Scraper Coinafrique - Vêtements",
+    page_title="Scraper Coinafrique - Multi-Catégories",
     page_icon="👔",
     layout="wide"
 )
@@ -124,10 +124,6 @@ st.markdown("""
         background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%) !important;
     }
     
-    .stButton>button:active {
-        transform: translateY(-2px) scale(0.98);
-    }
-    
     /* Tableau avec effet premium */
     [data-testid="stDataFrame"] {
         border-radius: 18px;
@@ -179,7 +175,27 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(255, 105, 180, 0.2);
     }
     
-    /* Divider stylisé */
+    /* Tabs stylisés */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 10px;
+        border-radius: 15px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 218, 185, 0.3));
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 700;
+        border: 2px solid rgba(255, 182, 193, 0.4);
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #FF69B4, #FFD700) !important;
+        color: white !important;
+    }
+    
     hr {
         border: none;
         height: 2px;
@@ -190,7 +206,6 @@ st.markdown("""
         margin: 2rem 0;
     }
     
-    /* Images avec effet hover */
     img {
         border-radius: 12px;
         transition: all 0.3s ease;
@@ -204,10 +219,74 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Configuration des catégories
+CATEGORIES = {
+    "Vêtements Homme 👔": {
+        "url": "https://sn.coinafrique.com/categorie/vetements-homme",
+        "icon": "👔",
+        "column": "type_habits"
+    },
+    "Chaussures Homme 👞": {
+        "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
+        "icon": "👞",
+        "column": "type_shoes"
+    },
+    "Vêtements Enfants 👶": {
+        "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
+        "icon": "👶",
+        "column": "type_clothes"
+    },
+    "Chaussures Enfants 👟": {
+        "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
+        "icon": "👟",
+        "column": "type_shoes"
+    }
+}
+
+# Fonction de scraping
+def scrape_category(url, num_pages, column_name):
+    """Scrape une catégorie spécifique"""
+    data = []
+    
+    for i in range(num_pages):
+        try:
+            page_url = f'{url}?page={i}'
+            res = get(page_url)
+            soup = bs(res.content, 'html.parser')
+            containers = soup.find_all('div', class_='col s6 m4 l3')
+            
+            for container in containers:
+                try:
+                    item_type = container.find('p', 'ad__card-description').text.strip()
+                    price = container.find('p', class_='ad__card-price').text.replace('CFA', '').strip()
+                    adress = container.find('p', class_='ad__card-location').text.strip()
+                    img = (container.find('img', class_='ad__card-img'))['src']
+                    
+                    dic = {
+                        column_name: item_type,
+                        'price': price,
+                        'adress': adress,
+                        'img': img
+                    }
+                    data.append(dic)
+                except:
+                    pass
+        except:
+            pass
+    
+    return pd.DataFrame(data)
+
 # Sidebar
 with st.sidebar:
-    st.markdown("## 👔 User Input Features")
+    st.markdown("## 🛍️ User Input Features")
     st.markdown("---")
+    
+    st.markdown("### Catégorie")
+    selected_category = st.selectbox(
+        "Choisir une catégorie",
+        list(CATEGORIES.keys()),
+        key="category_select"
+    )
     
     st.markdown("### Pages Indexes")
     num_pages = st.selectbox(
@@ -224,9 +303,9 @@ with st.sidebar:
         "Choisir une option",
         [
             "Scrape data using BeautifulSoup",
-            "Scrape data using beautiful...",
             "Download scraped data",
             "Dashboard of the data",
+            "Scrape ALL categories",
             "Evaluate the App"
         ],
         key="option_select"
@@ -234,14 +313,14 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📊 Info")
-    st.info(f"**Pages:** {num_pages}\n\n**Option:** {option_choice[:20]}...")
+    st.info(f"**Catégorie:** {selected_category}\n\n**Pages:** {num_pages}")
 
 # Zone principale
-st.markdown('<h1 class="main-title">🛍️ Scraper Coinafrique - Vêtements Homme</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Cette application permet de scraper les données de vêtements depuis coinafrique.com sur plusieurs pages. Vous pouvez également télécharger les données scrapées directement ou visualiser un dashboard.</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-title">🛍️ Scraper Coinafrique Multi-Catégories</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Scrapez des données de 4 catégories : vêtements homme, chaussures homme, vêtements enfants et chaussures enfants depuis coinafrique.com</p>', unsafe_allow_html=True)
 
 st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4")
-st.markdown("**Data source:** [Coinafrique Sénégal](https://sn.coinafrique.com) — [Catégorie Vêtements](https://sn.coinafrique.com/categorie/vetements-homme)")
+st.markdown("**Data source:** [Coinafrique Sénégal](https://sn.coinafrique.com)")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -249,91 +328,112 @@ st.markdown("<br>", unsafe_allow_html=True)
 if option_choice == "Scrape data using BeautifulSoup":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("👕 Scraper les vêtements"):
-            data = []
-            
+        category_info = CATEGORIES[selected_category]
+        if st.button(f"{category_info['icon']} Scraper {selected_category}"):
             progress_bar = st.progress(0)
             status_text = st.empty()
             
-            total_ads = 0
             start_time = time.time()
+            status_text.markdown(f"**⏳ Scraping de {selected_category} en cours...**")
             
-            for i in range(num_pages):
-                status_text.markdown(f"**⏳ Scraping en cours... Page {i+1}/{num_pages}**")
-                
-                try:
-                    url = f'https://sn.coinafrique.com/categorie/vetements-homme?page={i}'
-                    res = get(url)
-                    soup = bs(res.content, 'html.parser')
-                    containers = soup.find_all('div', class_='col s6 m4 l3')
-                    
-                    for container in containers:
-                        try:
-                            type_habits = container.find('p', 'ad__card-description').text.strip()
-                            price = container.find('p', class_='ad__card-price').text.replace('CFA', '').strip()
-                            adress = container.find('p', class_='ad__card-location').text.strip()
-                            img = (container.find('img', class_='ad__card-img'))['src']
-                            
-                            dic = {
-                                'type_habits': type_habits,
-                                'price': price,
-                                'adress': adress,
-                                'img': img
-                            }
-                            data.append(dic)
-                            total_ads += 1
-                        except:
-                            pass
-                    
-                    progress_bar.progress((i + 1) / num_pages)
-                    
-                except Exception as e:
-                    st.warning(f"Erreur page {i+1}")
+            df = scrape_category(
+                category_info['url'], 
+                num_pages, 
+                category_info['column']
+            )
             
             elapsed_time = time.time() - start_time
+            progress_bar.progress(1.0)
             status_text.markdown(f"**✅ Scraping terminé en {elapsed_time:.2f} secondes !**")
             
-            if data:
-                df = pd.DataFrame(data)
-                st.session_state['scraped_data'] = df
+            if not df.empty:
+                st.session_state[f'scraped_data_{selected_category}'] = df
+                st.session_state['current_category'] = selected_category
                 st.session_state['num_pages'] = num_pages
                 st.session_state['elapsed_time'] = elapsed_time
+            else:
+                st.error("❌ Aucune donnée récupérée.")
+
+elif option_choice == "Scrape ALL categories":
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🚀 Scraper TOUTES les catégories"):
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            start_time = time.time()
+            total_categories = len(CATEGORIES)
+            
+            for idx, (cat_name, cat_info) in enumerate(CATEGORIES.items()):
+                status_text.markdown(f"**⏳ Scraping {cat_name}... ({idx+1}/{total_categories})**")
+                
+                df = scrape_category(
+                    cat_info['url'], 
+                    num_pages, 
+                    cat_info['column']
+                )
+                
+                if not df.empty:
+                    st.session_state[f'scraped_data_{cat_name}'] = df
+                
+                progress_bar.progress((idx + 1) / total_categories)
+            
+            elapsed_time = time.time() - start_time
+            status_text.markdown(f"**✅ Toutes les catégories scrapées en {elapsed_time:.2f} secondes !**")
+            st.session_state['all_scraped'] = True
+            st.session_state['elapsed_time'] = elapsed_time
 
 elif option_choice == "Download scraped data":
-    if 'scraped_data' in st.session_state:
-        df = st.session_state['scraped_data']
-        st.success(f"✅ {len(df)} annonces disponibles pour téléchargement")
+    available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
+    
+    if available_data:
+        st.success(f"✅ {len(available_data)} catégorie(s) disponible(s) pour téléchargement")
         
-        csv = df.to_csv(index=False).encode('utf-8')
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.download_button(
-                label="📥 Télécharger les données CSV",
-                data=csv,
-                file_name=f"coinafrique_vetements.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
+        for cat_name in available_data:
+            df = st.session_state[f'scraped_data_{cat_name}']
+            csv = df.to_csv(index=False).encode('utf-8')
+            
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.download_button(
+                    label=f"📥 Télécharger {cat_name} ({len(df)} lignes)",
+                    data=csv,
+                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
     else:
         st.warning("⚠️ Aucune donnée scrapée disponible. Veuillez d'abord scraper les données.")
 
 elif option_choice == "Dashboard of the data":
-    if 'scraped_data' in st.session_state:
-        df = st.session_state['scraped_data']
-        
+    available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
+    
+    if available_data:
         st.markdown("## 📊 Dashboard des données")
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total annonces", len(df), "📦")
-        with col2:
-            st.metric("Adresses uniques", df['adress'].nunique(), "📍")
-        with col3:
-            st.metric("Prix moyen", f"{df['price'].astype(str).str.replace(' ', '').str.replace(',', '').apply(lambda x: float(x) if x.replace('.','').isdigit() else 0).mean():.0f} CFA", "💰")
+        # Créer des onglets pour chaque catégorie
+        tabs = st.tabs(available_data)
         
-        st.markdown("### 📈 Distribution des prix")
-        st.bar_chart(df['adress'].value_counts().head(10))
-        
+        for idx, cat_name in enumerate(available_data):
+            with tabs[idx]:
+                df = st.session_state[f'scraped_data_{cat_name}']
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total annonces", len(df), "📦")
+                with col2:
+                    st.metric("Adresses uniques", df['adress'].nunique(), "📍")
+                with col3:
+                    try:
+                        avg_price = df['price'].astype(str).str.replace(' ', '').str.replace(',', '').apply(
+                            lambda x: float(x) if x.replace('.','').isdigit() else 0
+                        ).mean()
+                        st.metric("Prix moyen", f"{avg_price:.0f} CFA", "💰")
+                    except:
+                        st.metric("Prix moyen", "N/A", "💰")
+                
+                st.markdown("### 📈 Distribution des localisations")
+                st.bar_chart(df['adress'].value_counts().head(10))
     else:
         st.warning("⚠️ Aucune donnée disponible. Veuillez d'abord scraper les données.")
 
@@ -347,12 +447,13 @@ elif option_choice == "Evaluate the App":
         st.success(f"Merci pour votre note de {rating}/5 étoiles ! 🌟")
 
 # Affichage des données si elles existent
-if 'scraped_data' in st.session_state and option_choice == "Scrape data using BeautifulSoup":
-    df = st.session_state['scraped_data']
+if 'current_category' in st.session_state and option_choice == "Scrape data using BeautifulSoup":
+    cat_name = st.session_state['current_category']
+    df = st.session_state[f'scraped_data_{cat_name}']
     num_pages = st.session_state.get('num_pages', 0)
     
     st.markdown("---")
-    st.markdown("## 📊 Display data dimension")
+    st.markdown(f"## 📊 Résultats : {cat_name}")
     st.markdown(f"**Data dimension:** {len(df)} rows and {len(df.columns)} columns.")
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -369,7 +470,7 @@ if 'scraped_data' in st.session_state and option_choice == "Scrape data using Be
         st.download_button(
             label="📥 Download data as CSV",
             data=csv,
-            file_name=f"coinafrique_vetements_{num_pages}pages.csv",
+            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}_{num_pages}pages.csv",
             mime="text/csv",
             use_container_width=True
         )
@@ -385,5 +486,14 @@ if 'scraped_data' in st.session_state and option_choice == "Scrape data using Be
             st.caption(f"💰 {row.price} CFA")
             st.caption(f"📍 {row.adress[:15]}...")
 
-if option_choice not in ["Scrape data using BeautifulSoup", "Download scraped data", "Dashboard of the data", "Evaluate the App"]:
+if 'all_scraped' in st.session_state and option_choice == "Scrape ALL categories":
+    st.markdown("---")
+    st.markdown("## 🎉 Toutes les catégories ont été scrapées !")
+    
+    for cat_name in CATEGORIES.keys():
+        if f'scraped_data_{cat_name}' in st.session_state:
+            df = st.session_state[f'scraped_data_{cat_name}']
+            st.success(f"✅ {cat_name}: {len(df)} annonces récupérées")
+
+if option_choice not in ["Scrape data using BeautifulSoup", "Download scraped data", "Dashboard of the data", "Scrape ALL categories", "Evaluate the App"]:
     st.info("🔧 Cette fonctionnalité est en cours de développement...")
