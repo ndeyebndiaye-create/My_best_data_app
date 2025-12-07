@@ -3,6 +3,9 @@ import pandas as pd
 from requests import get
 from bs4 import BeautifulSoup as bs
 import time
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 # Configuration de la page
 st.set_page_config(
@@ -175,27 +178,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(255, 105, 180, 0.2);
     }
     
-    /* Tabs stylisés */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.6);
-        padding: 10px;
-        border-radius: 15px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: linear-gradient(135deg, rgba(255, 182, 193, 0.3), rgba(255, 218, 185, 0.3));
-        border-radius: 10px;
-        padding: 10px 20px;
-        font-weight: 700;
-        border: 2px solid rgba(255, 182, 193, 0.4);
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #FF69B4, #FFD700) !important;
-        color: white !important;
-    }
-    
     hr {
         border: none;
         height: 2px;
@@ -216,6 +198,13 @@ st.markdown("""
         transform: scale(1.05);
         box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
     }
+    
+    /* Style pour les iframes */
+    iframe {
+        border-radius: 15px;
+        border: 2px solid rgba(255, 182, 193, 0.3);
+        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -224,22 +213,26 @@ CATEGORIES = {
     "Vêtements Homme 👔": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
         "icon": "👔",
-        "column": "type_habits"
+        "column": "type_habits",
+        "color": "#667eea"
     },
     "Chaussures Homme 👞": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
         "icon": "👞",
-        "column": "type_shoes"
+        "column": "type_shoes",
+        "color": "#764ba2"
     },
     "Vêtements Enfants 👶": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
         "icon": "👶",
-        "column": "type_clothes"
+        "column": "type_clothes",
+        "color": "#f093fb"
     },
     "Chaussures Enfants 👟": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
         "icon": "👟",
-        "column": "type_shoes"
+        "column": "type_shoes",
+        "color": "#4facfe"
     }
 }
 
@@ -276,6 +269,119 @@ def scrape_category(url, num_pages, column_name):
     
     return pd.DataFrame(data)
 
+def clean_price(price_str):
+    """Nettoie et convertit les prix en float"""
+    try:
+        cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
+        return float(cleaned) if cleaned.isdigit() else 0
+    except:
+        return 0
+
+def create_plots_for_category(df, cat_name, cat_color):
+    """Crée les graphiques pour une catégorie"""
+    
+    # Nettoyer les prix
+    df['price_numeric'] = df['price'].apply(clean_price)
+    df_clean = df[df['price_numeric'] > 0]
+    
+    if len(df_clean) == 0:
+        st.warning(f"Pas de données de prix valides pour {cat_name}")
+        return
+    
+    # Créer une grille de graphiques 2x2
+    fig = make_subplots(
+        rows=2, cols=2,
+        subplot_titles=(
+            'Distribution KDE des Prix',
+            'Top 10 Localisations',
+            'Box Plot des Prix',
+            'Distribution des Prix par Quartile'
+        ),
+        specs=[
+            [{"type": "scatter"}, {"type": "bar"}],
+            [{"type": "box"}, {"type": "bar"}]
+        ],
+        vertical_spacing=0.15,
+        horizontal_spacing=0.1
+    )
+    
+    # 1. KDE Plot (Distribution des prix)
+    from scipy import stats
+    import numpy as np
+    
+    prices = df_clean['price_numeric'].values
+    kde = stats.gaussian_kde(prices)
+    x_range = np.linspace(prices.min(), prices.max(), 200)
+    kde_values = kde(x_range)
+    
+    fig.add_trace(
+        go.Scatter(
+            x=x_range,
+            y=kde_values,
+            fill='tozeroy',
+            name='Distribution KDE',
+            line=dict(color=cat_color, width=2),
+            fillcolor=f'rgba{tuple(list(int(cat_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.3])}'
+        ),
+        row=1, col=1
+    )
+    
+    # 2. Top 10 Localisations
+    top_locations = df['adress'].value_counts().head(10)
+    fig.add_trace(
+        go.Bar(
+            x=top_locations.values,
+            y=top_locations.index,
+            orientation='h',
+            name='Annonces',
+            marker=dict(color=cat_color)
+        ),
+        row=1, col=2
+    )
+    
+    # 3. Box Plot des prix
+    fig.add_trace(
+        go.Box(
+            y=df_clean['price_numeric'],
+            name='Prix',
+            marker=dict(color=cat_color),
+            boxmean='sd'
+        ),
+        row=2, col=1
+    )
+    
+    # 4. Distribution par quartiles
+    quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Bas)', 'Q2', 'Q3', 'Q4 (Haut)'])
+    quartile_counts = quartiles.value_counts().sort_index()
+    
+    fig.add_trace(
+        go.Bar(
+            x=quartile_counts.index,
+            y=quartile_counts.values,
+            name='Quartiles',
+            marker=dict(color=[cat_color] * len(quartile_counts))
+        ),
+        row=2, col=2
+    )
+    
+    # Mise à jour du layout
+    fig.update_xaxes(title_text="Prix (CFA)", row=1, col=1)
+    fig.update_yaxes(title_text="Densité", row=1, col=1)
+    fig.update_xaxes(title_text="Nombre d'annonces", row=1, col=2)
+    fig.update_xaxes(title_text="", row=2, col=1)
+    fig.update_yaxes(title_text="Prix (CFA)", row=2, col=1)
+    fig.update_xaxes(title_text="Quartile", row=2, col=2)
+    fig.update_yaxes(title_text="Nombre", row=2, col=2)
+    
+    fig.update_layout(
+        height=800,
+        showlegend=False,
+        title_text=f"Analyse des données - {cat_name}",
+        title_font_size=20
+    )
+    
+    return fig
+
 # Sidebar
 with st.sidebar:
     st.markdown("## 🛍️ User Input Features")
@@ -305,7 +411,6 @@ with st.sidebar:
             "Scrape data using BeautifulSoup",
             "Download scraped data",
             "Dashboard of the data",
-            "Scrape ALL categories",
             "Evaluate the App"
         ],
         key="option_select"
@@ -319,7 +424,7 @@ with st.sidebar:
 st.markdown('<h1 class="main-title">🛍️ Scraper Coinafrique Multi-Catégories</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Scrapez des données de 4 catégories : vêtements homme, chaussures homme, vêtements enfants et chaussures enfants depuis coinafrique.com</p>', unsafe_allow_html=True)
 
-st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4")
+st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, plotly, scipy")
 st.markdown("**Data source:** [Coinafrique Sénégal](https://sn.coinafrique.com)")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -354,35 +459,6 @@ if option_choice == "Scrape data using BeautifulSoup":
             else:
                 st.error("❌ Aucune donnée récupérée.")
 
-elif option_choice == "Scrape ALL categories":
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🚀 Scraper TOUTES les catégories"):
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            start_time = time.time()
-            total_categories = len(CATEGORIES)
-            
-            for idx, (cat_name, cat_info) in enumerate(CATEGORIES.items()):
-                status_text.markdown(f"**⏳ Scraping {cat_name}... ({idx+1}/{total_categories})**")
-                
-                df = scrape_category(
-                    cat_info['url'], 
-                    num_pages, 
-                    cat_info['column']
-                )
-                
-                if not df.empty:
-                    st.session_state[f'scraped_data_{cat_name}'] = df
-                
-                progress_bar.progress((idx + 1) / total_categories)
-            
-            elapsed_time = time.time() - start_time
-            status_text.markdown(f"**✅ Toutes les catégories scrapées en {elapsed_time:.2f} secondes !**")
-            st.session_state['all_scraped'] = True
-            st.session_state['elapsed_time'] = elapsed_time
-
 elif option_choice == "Download scraped data":
     available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
     
@@ -400,7 +476,8 @@ elif option_choice == "Download scraped data":
                     data=csv,
                     file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
                     mime="text/csv",
-                    use_container_width=True
+                    use_container_width=True,
+                    key=f"download_{cat_name}"
                 )
     else:
         st.warning("⚠️ Aucune donnée scrapée disponible. Veuillez d'abord scraper les données.")
@@ -411,40 +488,69 @@ elif option_choice == "Dashboard of the data":
     if available_data:
         st.markdown("## 📊 Dashboard des données")
         
-        # Créer des onglets pour chaque catégorie
-        tabs = st.tabs(available_data)
-        
-        for idx, cat_name in enumerate(available_data):
-            with tabs[idx]:
-                df = st.session_state[f'scraped_data_{cat_name}']
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Total annonces", len(df), "📦")
-                with col2:
-                    st.metric("Adresses uniques", df['adress'].nunique(), "📍")
-                with col3:
-                    try:
-                        avg_price = df['price'].astype(str).str.replace(' ', '').str.replace(',', '').apply(
-                            lambda x: float(x) if x.replace('.','').isdigit() else 0
-                        ).mean()
-                        st.metric("Prix moyen", f"{avg_price:.0f} CFA", "💰")
-                    except:
-                        st.metric("Prix moyen", "N/A", "💰")
-                
-                st.markdown("### 📈 Distribution des localisations")
-                st.bar_chart(df['adress'].value_counts().head(10))
+        for cat_name in available_data:
+            df = st.session_state[f'scraped_data_{cat_name}']
+            cat_info = CATEGORIES[cat_name]
+            
+            st.markdown(f"### {cat_info['icon']} {cat_name}")
+            
+            # Métriques
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Total annonces", len(df), "📦")
+            with col2:
+                st.metric("Adresses uniques", df['adress'].nunique(), "📍")
+            with col3:
+                try:
+                    df['price_numeric'] = df['price'].apply(clean_price)
+                    avg_price = df[df['price_numeric'] > 0]['price_numeric'].mean()
+                    st.metric("Prix moyen", f"{avg_price:,.0f} CFA", "💰")
+                except:
+                    st.metric("Prix moyen", "N/A", "💰")
+            with col4:
+                try:
+                    median_price = df[df['price_numeric'] > 0]['price_numeric'].median()
+                    st.metric("Prix médian", f"{median_price:,.0f} CFA", "📊")
+                except:
+                    st.metric("Prix médian", "N/A", "📊")
+            
+            # Graphiques
+            fig = create_plots_for_category(df, cat_name, cat_info['color'])
+            if fig:
+                st.plotly_chart(fig, use_container_width=True)
+            
+            st.markdown("---")
     else:
         st.warning("⚠️ Aucune donnée disponible. Veuillez d'abord scraper les données.")
 
 elif option_choice == "Evaluate the App":
     st.markdown("## ⭐ Évaluation de l'application")
     
-    rating = st.slider("Note globale", 1, 5, 5)
-    feedback = st.text_area("Vos commentaires", placeholder="Partagez votre expérience...")
+    col1, col2 = st.columns(2)
     
-    if st.button("Soumettre l'évaluation"):
-        st.success(f"Merci pour votre note de {rating}/5 étoiles ! 🌟")
+    with col1:
+        st.markdown("### 📝 Formulaire Google Forms")
+        st.markdown("Évaluez notre application via Google Forms :")
+        st.markdown("[![Google Forms](https://img.shields.io/badge/Google%20Forms-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog)")
+        
+        # Intégration iframe Google Forms
+        st.components.v1.iframe(
+            "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?embedded=true",
+            height=800,
+            scrolling=True
+        )
+    
+    with col2:
+        st.markdown("### 📋 Formulaire KoboToolbox")
+        st.markdown("Ou utilisez KoboToolbox :")
+        st.markdown("[![KoboToolbox](https://img.shields.io/badge/KoboToolbox-00A79D?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6Ii8+PC9zdmc+)](https://ee.kobotoolbox.org/x/LNbLn5W1)")
+        
+        # Intégration iframe KoboToolbox
+        st.components.v1.iframe(
+            "https://ee.kobotoolbox.org/x/LNbLn5W1",
+            height=800,
+            scrolling=True
+        )
 
 # Affichage des données si elles existent
 if 'current_category' in st.session_state and option_choice == "Scrape data using BeautifulSoup":
@@ -485,15 +591,3 @@ if 'current_category' in st.session_state and option_choice == "Scrape data usin
             st.image(row.img, use_container_width=True)
             st.caption(f"💰 {row.price} CFA")
             st.caption(f"📍 {row.adress[:15]}...")
-
-if 'all_scraped' in st.session_state and option_choice == "Scrape ALL categories":
-    st.markdown("---")
-    st.markdown("## 🎉 Toutes les catégories ont été scrapées !")
-    
-    for cat_name in CATEGORIES.keys():
-        if f'scraped_data_{cat_name}' in st.session_state:
-            df = st.session_state[f'scraped_data_{cat_name}']
-            st.success(f"✅ {cat_name}: {len(df)} annonces récupérées")
-
-if option_choice not in ["Scrape data using BeautifulSoup", "Download scraped data", "Dashboard of the data", "Scrape ALL categories", "Evaluate the App"]:
-    st.info("🔧 Cette fonctionnalité est en cours de développement...")
