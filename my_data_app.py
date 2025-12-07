@@ -15,7 +15,7 @@ KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 
 # Page Configuration
 st.set_page_config(
-    page_title="Coinafrique Scraper - Multi-Categories",
+    page_title="Coinafrique Scraper - Multi-Categories", # FIX 1: Ensure this line only uses standard spaces
     page_icon="👔",
     layout="wide"
 )
@@ -32,24 +32,6 @@ st.markdown("""
         background-position: center;
     }
 
-    /* Specific background for the Welcome Page (targeting Streamlit's main block ID) */
-    /* This targets the main content div for the welcome page. The exact class name
-       might change with Streamlit updates, but 'st-emotion-cache-18ni4n2' is a common one.
-       You might need to inspect your deployed app's CSS to get the precise ID if it fails. */
-    .st-emotion-cache-18ni4n2, .main .block-container { /* Adding .main .block-container to ensure it overrides */
-        background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 250, 250, 0.9)),
-                    url('https://images.unsplash.com/photo-1517404215737-04644dc00d38?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Luxurious, welcoming background */
-        background-size: cover;
-        background-attachment: fixed;
-        background-position: center;
-        border-radius: 25px; /* Keep the card effect */
-        padding: 3rem;
-        margin-top: 2rem;
-        box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2),
-                    0 0 0 1px rgba(255, 182, 193, 0.3);
-        border: 2px solid rgba(255, 182, 193, 0.2);
-    }
-    
     /* Sidebar with elegant pink/gold gradient */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg,
@@ -93,8 +75,8 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
-    /* Main area with premium card effect (overridden for welcome page) */
-    /* .main .block-container {
+    /* Main area with premium card effect (default) */
+    .main .block-container {
         background: linear-gradient(135deg,
                     rgba(255, 255, 255, 0.98) 0%,
                     rgba(255, 250, 250, 0.98) 100%);
@@ -104,8 +86,24 @@ st.markdown("""
         box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2),
                     0 0 0 1px rgba(255, 182, 193, 0.3);
         border: 2px solid rgba(255, 182, 193, 0.2);
-    } */
+    }
     
+    /* Specific background for the Welcome Page container */
+    /* This uses a unique ID only applied to the welcome page container */
+    #welcome-page-container {
+        background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 250, 250, 0.9)),
+                    url('https://images.unsplash.com/photo-1517404215737-04644dc00d38?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Luxurious, welcoming background */
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        border-radius: 25px;
+        padding: 3rem;
+        margin-top: 2rem;
+        box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2),
+                    0 0 0 1px rgba(255, 182, 193, 0.3);
+        border: 2px solid rgba(255, 182, 193, 0.2);
+    }
+
     /* Main title for welcome page */
     .welcome-title {
         font-size: 3.5rem;
@@ -431,8 +429,10 @@ def create_charts_for_category(df, cat_name, cat_color):
     if len(df_clean['price_numeric'].unique()) >= 4 and len(df_clean) >= 4:
         # Use pd.qcut and 'drop' duplicates if not enough unique data points
         try:
+            # FIX 3: Move all plotting logic inside try block to prevent UnboundLocalError
             quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'], duplicates='drop')
             quartile_counts = quartiles.value_counts().sort_index() 
+            
             axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
             axes[1, 1].set_xticks(range(len(quartile_counts)))
             axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
@@ -441,6 +441,7 @@ def create_charts_for_category(df, cat_name, cat_color):
             axes[1, 1].set_ylabel('Count', fontsize=12)
             axes[1, 1].grid(True, alpha=0.3, axis='y')
         except ValueError as e:
+            # If an error occurs, print a message instead of plotting
             axes[1, 1].text(0.5, 0.5, f'Quartile error: {e}', ha='center', va='center', fontsize=10)
     else:
         axes[1, 1].text(0.5, 0.5, 'Not enough unique prices for Quartile analysis', ha='center', va='center')
@@ -509,11 +510,10 @@ else:
 
 if page_selection == "1. Welcome & Guide 🏠":
     
-    # We apply the specific background for the welcome page here using an empty container
-    # This empty container effectively becomes the 'main content' block for this page
-    # The CSS rule '.st-emotion-cache-18ni4n2, .main .block-container' targets this.
-    welcome_container = st.empty()
-    with welcome_container:
+    # Use st.container with a specific ID to apply the welcome background CSS
+    with st.container(border=False):
+        st.markdown('<div id="welcome-page-container">', unsafe_allow_html=True)
+        
         st.markdown('<h1 class="welcome-title">Welcome to the 🛒 Coinafrique Scraper</h1>', unsafe_allow_html=True)
         st.markdown('<p class="subtitle">Your dedicated tool for **online sales market analysis** on Coinafrique Senegal. Prepare your market studies with a click!</p>', unsafe_allow_html=True)
 
@@ -536,6 +536,8 @@ if page_selection == "1. Welcome & Guide 🏠":
         """)
         st.markdown("---")
         st.info("💡 **Ready to start?** Go to the **'2. Scrape & Analyze 📊'** tab to launch your first market study.")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
 else: # Scraping and Analysis Page
     
@@ -544,4 +546,174 @@ else: # Scraping and Analysis Page
     st.markdown('<p class="subtitle">Scrape data from 4 categories: men\'s clothing, men\'s shoes, children\'s clothing and children\'s shoes from coinafrique.com</p>', unsafe_allow_html=True)
     st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, scipy, matplotlib, seaborn")
 
-    st.markdown(f"**Data source:** [{selected_category}]({cat
+    # FIX 2: Corrected the f-string syntax for the link
+    st.markdown(f"**Data source:** [{selected_category}]({cat_info['url']})") 
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Logic based on the chosen option
+    if option_choice == "Scrape data using BeautifulSoup":
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button(f"{cat_info['icon']} Scrape {selected_category}"):
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                start_time = time.time()
+                status_text.markdown(f"**⏳ Scraping {selected_category} in progress...**")
+                
+                df = scrape_category(
+                    cat_info['url'],
+                    num_pages,
+                    cat_info['column']
+                )
+                
+                elapsed_time = time.time() - start_time
+                progress_bar.progress(1.0)
+                status_text.markdown(f"**✅ Scraping completed in {elapsed_time:.2f} seconds!**")
+                
+                if not df.empty:
+                    st.session_state[f'scraped_data_{selected_category}'] = df
+                    st.session_state['current_category'] = selected_category
+                    st.session_state['num_pages'] = num_pages
+                    st.session_state['elapsed_time'] = elapsed_time
+                    st.success(f"Successfully scraped **{len(df)}** rows of data.")
+                else:
+                    st.error("❌ No data retrieved. The page structure may have changed or the number of pages is too low.")
+        
+        # Display data if available (after scraping)
+        if 'current_category' in st.session_state and st.session_state['current_category'] == selected_category:
+            cat_name = st.session_state['current_category']
+            df = st.session_state[f'scraped_data_{cat_name}']
+            num_pages_scraped = st.session_state.get('num_pages', 0)
+            
+            st.markdown("---")
+            st.markdown(f"## 📊 Results: {cat_name}")
+            st.markdown(f"**Data dimension:** {len(df)} rows and {len(df.columns)} columns.")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Display table
+            st.dataframe(df, use_container_width=True, height=400)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Download button
+            csv = df.to_csv(index=False).encode('utf-8')
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.download_button(
+                    label="📥 Download data as CSV",
+                    data=csv,
+                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}_{num_pages_scraped}pages.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Image gallery
+            st.markdown("### 🖼️ Preview of Items")
+            cols = st.columns(5)
+            # Ensure the 'img' column exists and the DataFrame is not empty
+            if 'img' in df.columns and not df.empty:
+                for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
+                    with col:
+                        # Use placeholder image if the image is missing
+                        img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
+                        st.image(img_url, use_container_width=True)
+                        st.caption(f"💰 {row.price} CFA")
+                        st.caption(f"📍 {row.adress[:15]}...")
+            else:
+                st.info("No images to display or 'img' column missing.")
+        
+
+    elif option_choice == "Download scraped data":
+        available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
+        
+        if available_data:
+            st.success(f"✅ {len(available_data)} category(ies) available for download")
+            
+            for cat_name in available_data:
+                df = st.session_state[f'scraped_data_{cat_name}']
+                csv = df.to_csv(index=False).encode('utf-8')
+                
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.download_button(
+                        label=f"📥 Download {cat_name} ({len(df)} rows)",
+                        data=csv,
+                        file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}.csv",
+                        mime="text/csv",
+                        use_container_width=True,
+                        key=f"download_{cat_name}"
+                    )
+        else:
+            st.warning("⚠️ No scraped data available. Please scrape data first.")
+            
+    elif option_choice == "Data Dashboard":
+        available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
+        
+        if available_data:
+            st.markdown("## 📊 Data Dashboard")
+            
+            for cat_name in available_data:
+                df = st.session_state[f'scraped_data_{cat_name}']
+                cat_info_dash = CATEGORIES[cat_name]
+                
+                st.markdown(f"### {cat_info_dash['icon']} {cat_name}")
+                
+                # Metrics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Total Ads", len(df), "📦")
+                with col2:
+                    st.metric("Unique Locations", df['adress'].nunique(), "📍")
+                with col3:
+                    try:
+                        df['price_numeric'] = df['price'].apply(clean_price)
+                        avg_price = df[df['price_numeric'] > 0]['price_numeric'].mean()
+                        st.metric("Average Price", f"{avg_price:,.0f} CFA", "💰")
+                    except:
+                        st.metric("Average Price", "N/A", "💰")
+                with col4:
+                    try:
+                        median_price = df[df['price_numeric'] > 0]['price_numeric'].median()
+                        st.metric("Median Price", f"{median_price:,.0f} CFA", "📊")
+                    except:
+                        st.metric("Median Price", "N/A", "📊")
+                
+                # Charts
+                fig = create_charts_for_category(df, cat_name, cat_info_dash['color'])
+                if fig:
+                    st.pyplot(fig)
+                else:
+                    st.warning("Not enough data points to generate meaningful charts for this category (needs at least 10 entries with unique prices).")
+                
+                st.markdown("---")
+        else:
+            st.warning("⚠️ No data available. Please scrape data first.")
+            
+    elif option_choice == "Evaluate the App":
+        st.markdown("## ⭐ App Evaluation")
+        st.markdown("Please take a moment to evaluate our application. Your feedback is valuable for its improvement.")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown('<div id="button-evaluate-google">', unsafe_allow_html=True)
+            st.link_button(
+                label="✨ Evaluate on Google Forms",
+                url=GOOGLE_FORMS_LINK,
+                use_container_width=True
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown('<div id="button-evaluate-kobo">', unsafe_allow_html=True)
+            st.link_button(
+                label="📝 Evaluate on KoboToolbox",
+                url=KOBOTOOLBOX_LINK,
+                use_container_width=True
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
