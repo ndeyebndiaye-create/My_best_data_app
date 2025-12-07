@@ -1,6 +1,29 @@
 [theme]
-backgroundColor="#ECE1A2"
-secondaryBackgroundColor="#ecdcaa"
-textColor="#0e0f10"
-font="serif"
+# Couleur principale (vert d'eau)
+primaryColor = "#48c9b0"
 
+# Couleur de fond (blanc cassé)
+backgroundColor = "#f8f9fa"
+
+# Couleur de fond secondaire (vert d'eau très clair)
+secondaryBackgroundColor = "#e0f7f4"
+
+# Couleur du texte
+textColor = "#2c3e50"
+
+# Police de caractères
+font = "sans serif"
+
+[server]
+# Port du serveur (optionnel)
+port = 8501
+
+# Active le mode de rechargement automatique
+runOnSave = true
+
+[browser]
+# Collecte des statistiques d'utilisation (désactivé)
+gatherUsageStats = false
+
+# Titre de l'onglet du navigateur
+serverAddress = "localhost"
