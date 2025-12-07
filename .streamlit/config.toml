@@ -1,29 +1,32 @@
+## Fichier: .streamlit/config.toml
+
 [theme]
-# Couleur principale (vert d'eau)
-primaryColor = "#48c9b0"
+# Activer le thème personnalisé
+base = "light"
 
-# Couleur de fond (blanc cassé)
-backgroundColor = "#f8f9fa"
-
-# Couleur de fond secondaire (vert d'eau très clair)
-secondaryBackgroundColor = "#e0f7f4"
-
-# Couleur du texte
-textColor = "#2c3e50"
-
-# Police de caractères
+# Couleurs de base : Pour correspondre à votre thème élégant
+primaryColor = "#FF69B4"       # Rose vif (utilisé pour les boutons et les liens)
+backgroundColor = "#F0F8FF"    # AliceBlue ou très clair (le fond principal est géré par le CSS)
+secondaryBackgroundColor = "#FFF0F5" # Blush / Lavande très clair (pour les sidebar et les blocs secondaires)
+textColor = "#333333"          # Gris foncé pour le texte principal
 font = "sans serif"
 
-[server]
-# Port du serveur (optionnel)
-port = 8501
+# Couleurs de l'interface utilisateur
+# Ces couleurs définissent l'apparence des widgets, des messages d'alerte, etc.
+# Elles sont importantes pour l'accessibilité.
 
-# Active le mode de rechargement automatique
-runOnSave = true
+# Couleur des bordures des widgets, des lignes de séparation
+[ui]
+widgetColor = "#FFC0CB" # Light Pink / Bordures claires
 
-[browser]
-# Collecte des statistiques d'utilisation (désactivé)
-gatherUsageStats = false
+# Couleur des messages de succès (st.success)
+successColor = "#28A745"
 
-# Titre de l'onglet du navigateur
-serverAddress = "localhost"
+# Couleur des messages d'information (st.info)
+infoColor = "#17A2B8"
+
+# Couleur des messages d'avertissement (st.warning)
+warningColor = "#FFC107"
+
+# Couleur des messages d'erreur (st.error)
+dangerColor = "#DC3545"
