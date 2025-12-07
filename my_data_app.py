@@ -11,130 +11,195 @@ st.set_page_config(
     layout="wide"
 )
 
-# CSS personnalisé avec images de fond
+# CSS personnalisé avec design élégant rose/doré
 st.markdown("""
 <style>
-    /* Fond principal avec image de vêtements */
+    /* Fond principal avec image de boutique de luxe */
     .stApp {
-        background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
-                    url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=1200&q=80');
+        background: linear-gradient(rgba(255, 245, 250, 0.92), rgba(255, 240, 245, 0.92)),
+                    url('https://images.unsplash.com/photo-1558769132-cb1aea1f19e0?w=1400&q=80');
         background-size: cover;
         background-attachment: fixed;
         background-position: center;
     }
     
-    /* Sidebar avec image de mode */
+    /* Sidebar avec dégradé rose/doré élégant */
     [data-testid="stSidebar"] {
-        background: linear-gradient(rgba(176, 224, 230, 0.95), rgba(176, 224, 230, 0.95)),
-                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80');
+        background: linear-gradient(180deg, 
+                    rgba(255, 182, 193, 0.95) 0%, 
+                    rgba(255, 218, 185, 0.95) 50%,
+                    rgba(255, 228, 196, 0.95) 100%),
+                    url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80');
         background-size: cover;
         background-position: center;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     }
     
     [data-testid="stSidebar"] > div:first-child {
         background: transparent;
     }
     
-    /* Titres sidebar */
+    /* Titres sidebar avec effet doré */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3 {
-        color: #2c3e50 !important;
-        font-weight: 700;
-        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        color: #8B4513 !important;
+        font-weight: 800;
+        text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+        letter-spacing: 1px;
     }
     
     /* Labels sidebar */
     [data-testid="stSidebar"] label {
-        color: #2c3e50 !important;
-        font-weight: 600;
+        color: #8B4513 !important;
+        font-weight: 700;
+        font-size: 1rem;
     }
     
-    /* Select boxes sidebar */
+    /* Select boxes sidebar avec effet glassmorphism */
     [data-testid="stSidebar"] .stSelectbox > div > div {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 2px solid rgba(255, 182, 193, 0.4);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
-    /* Zone principale */
+    /* Zone principale avec effet carte premium */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        padding: 2.5rem;
+        background: linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(255, 250, 250, 0.98) 100%);
+        border-radius: 25px;
+        padding: 3rem;
         margin-top: 2rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2),
+                    0 0 0 1px rgba(255, 182, 193, 0.3);
+        border: 2px solid rgba(255, 182, 193, 0.2);
     }
     
-    /* Titre principal */
+    /* Titre principal avec dégradé rose-doré */
     .main-title {
-        font-size: 2.8rem;
-        font-weight: 800;
+        font-size: 3.2rem;
+        font-weight: 900;
         text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #FF69B4 0%, #FF1493 30%, #FFD700 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.3);
+        letter-spacing: 2px;
     }
     
     .subtitle {
         text-align: center;
-        color: #555;
-        font-size: 1.1rem;
+        color: #696969;
+        font-size: 1.15rem;
         margin-bottom: 2rem;
-        line-height: 1.6;
+        line-height: 1.7;
+        font-weight: 500;
     }
     
-    /* Boutons */
+    /* Boutons avec dégradé rose vif */
     .stButton>button {
-        background: linear-gradient(90deg, #48c9b0 0%, #20a39e 100%) !important;
+        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFC0CB 100%) !important;
         color: white !important;
-        font-weight: bold;
+        font-weight: 800;
         border: none;
-        border-radius: 12px;
-        padding: 15px 30px;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
+        border-radius: 15px;
+        padding: 18px 35px;
+        font-size: 1.15rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         width: 100%;
-        box-shadow: 0 4px 15px rgba(72, 201, 176, 0.3);
+        box-shadow: 0 8px 25px rgba(255, 20, 147, 0.35),
+                    inset 0 -2px 5px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
     }
     
     .stButton>button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(72, 201, 176, 0.4);
-        background: linear-gradient(90deg, #20a39e 0%, #48c9b0 100%) !important;
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(255, 20, 147, 0.5),
+                    inset 0 -2px 5px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%) !important;
     }
     
-    /* Tableau */
+    .stButton>button:active {
+        transform: translateY(-2px) scale(0.98);
+    }
+    
+    /* Tableau avec effet premium */
     [data-testid="stDataFrame"] {
-        border-radius: 15px;
+        border-radius: 18px;
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
+        border: 2px solid rgba(255, 182, 193, 0.3);
     }
     
-    /* Info boxes */
+    /* Info boxes avec glassmorphism */
     .stAlert {
         border-radius: 15px;
-        background-color: rgba(255, 255, 255, 0.9);
+        background: linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.95), 
+                    rgba(255, 245, 250, 0.95));
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 182, 193, 0.3);
+        box-shadow: 0 4px 20px rgba(255, 105, 180, 0.15);
     }
     
-    /* Progress bar */
+    /* Progress bar avec dégradé rose */
     .stProgress > div > div {
-        background: linear-gradient(90deg, #48c9b0 0%, #20a39e 100%);
+        background: linear-gradient(90deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
+        box-shadow: 0 2px 10px rgba(255, 20, 147, 0.4);
     }
     
-    /* Download button */
+    /* Download button doré */
     .stDownloadButton > button {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-        border-radius: 12px;
-        padding: 12px 25px;
-        font-weight: 600;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%) !important;
+        color: #8B4513 !important;
+        border-radius: 15px;
+        padding: 14px 28px;
+        font-weight: 700;
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     
     .stDownloadButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
+        background: linear-gradient(135deg, #FFA500 0%, #FFD700 50%, #FFDF00 100%) !important;
+    }
+    
+    /* Metrics avec effet carte */
+    [data-testid="stMetricValue"] {
+        color: #FF1493;
+        font-weight: 800;
+        text-shadow: 1px 1px 2px rgba(255, 105, 180, 0.2);
+    }
+    
+    /* Divider stylisé */
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, 
+                    transparent 0%, 
+                    rgba(255, 105, 180, 0.5) 50%, 
+                    transparent 100%);
+        margin: 2rem 0;
+    }
+    
+    /* Images avec effet hover */
+    img {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
     }
 </style>
 """, unsafe_allow_html=True)
