@@ -6,549 +6,224 @@ import time
 import numpy as np
 from scipy import stats
 
-# Configuration de la page
+# ===================== CONFIGURATION =====================
 st.set_page_config(
-    page_title="Coinafrique Scraper - Multi-Categories",
-    page_icon="👔",
+    page_title="Coinafrique Scraper 2025 - Mode & Chaussures Sénégal",
+    page_icon="Shopping Bag",
     layout="wide"
 )
 
-# CSS personnalisé avec design élégant rose/doré
+# ===================== CSS ULTRA PREMIUM =====================
 st.markdown("""
 <style>
-    /* Fond principal avec image de boutique de luxe */
     .stApp {
-        background: linear-gradient(rgba(255, 245, 250, 0.92), rgba(255, 240, 245, 0.92)),
-                    url('https://images.unsplash.com/photo-1558769132-cb1aea1f19e0?w=1400&q=80');
+        background: linear-gradient(rgba(255, 245, 250, 0.95), rgba(255, 240, 245, 0.95)),
+                    url('https://images.unsplash.com/photo-1558769132-cb1aea1f19e0?w=1400');
         background-size: cover;
         background-attachment: fixed;
-        background-position: center;
     }
-    
-    /* Sidebar avec dégradé rose/doré élégant */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, 
-                    rgba(255, 182, 193, 0.95) 0%, 
-                    rgba(255, 218, 185, 0.95) 50%,
-                    rgba(255, 228, 196, 0.95) 100%),
-                    url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80');
-        background-size: cover;
-        background-position: center;
-        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        background: linear-gradient(180deg, #FFB6C1 0%, #FF69B4 50%, #FF1493 100%);
+        box-shadow: 4px 0 20px rgba(255,20,147,0.3);
     }
-    
-    [data-testid="stSidebar"] > div:first-child {
-        background: transparent;
-    }
-    
-    /* Titres sidebar avec effet doré */
-    [data-testid="stSidebar"] h1, 
-    [data-testid="stSidebar"] h2, 
-    [data-testid="stSidebar"] h3 {
-        color: #8B4513 !important;
-        font-weight: 800;
-        text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
-        letter-spacing: 1px;
-    }
-    
-    /* Labels sidebar */
-    [data-testid="stSidebar"] label {
-        color: #8B4513 !important;
-        font-weight: 700;
-        font-size: 1rem;
-    }
-    
-    /* Select boxes sidebar avec effet glassmorphism */
-    [data-testid="stSidebar"] .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        border: 2px solid rgba(255, 182, 193, 0.4);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    /* Zone principale avec effet carte premium */
     .main .block-container {
-        background: linear-gradient(135deg, 
-                    rgba(255, 255, 255, 0.98) 0%, 
-                    rgba(255, 250, 250, 0.98) 100%);
+        background: rgba(255,255,255,0.98);
         border-radius: 25px;
         padding: 3rem;
         margin-top: 2rem;
-        box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2),
-                    0 0 0 1px rgba(255, 182, 193, 0.3);
-        border: 2px solid rgba(255, 182, 193, 0.2);
+        box-shadow: 0 20px 60px rgba(255,105,180,0.25);
+        border: 2px solid rgba(255,182,193,0.4);
     }
-    
-    /* Titre principal avec dégradé rose-doré */
     .main-title {
-        font-size: 3.2rem;
+        font-size: 3.5rem;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(135deg, #FF69B4 0%, #FF1493 30%, #FFD700 100%);
+        background: linear-gradient(90deg, #FF1493, #FF69B4, #FFD700);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.3);
+        text-shadow: 0 5px 15px rgba(255,20,147,0.3);
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #FF1493, #FF69B4);
+        color: white;
+        font-weight: 800;
+        border: none;
+        border-radius: 20px;
+        padding: 18px 40px;
+        font-size: 1.3rem;
+        box-shadow: 0 10px 30px rgba(255,20,147,0.4);
+        transition: all 0.4s;
+        width: 100%;
+        text-transform: uppercase;
         letter-spacing: 2px;
     }
-    
-    .subtitle {
-        text-align: center;
-        color: #696969;
-        font-size: 1.15rem;
-        margin-bottom: 2rem;
-        line-height: 1.7;
-        font-weight: 500;
-    }
-    
-    /* Boutons avec dégradé rose vif */
-    .stButton>button {
-        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFC0CB 100%) !important;
-        color: white !important;
-        font-weight: 800;
-        border: none;
-        border-radius: 15px;
-        padding: 18px 35px;
-        font-size: 1.15rem;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        width: 100%;
-        box-shadow: 0 8px 25px rgba(255, 20, 147, 0.35),
-                    inset 0 -2px 5px rgba(0,0,0,0.1);
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-    }
-    
     .stButton>button:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 15px 35px rgba(255, 20, 147, 0.5),
-                    inset 0 -2px 5px rgba(0,0,0,0.1);
-        background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%) !important;
+        transform: translateY(-7px);
+        box-shadow: 0 20px 40px rgba(255,20,147,0.6);
+        background: linear-gradient(135deg, #C71585, #FF1493);
     }
-    
-    /* Tableau avec effet premium */
-    [data-testid="stDataFrame"] {
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
-        border: 2px solid rgba(255, 182, 193, 0.3);
-    }
-    
-    /* Info boxes avec glassmorphism */
-    .stAlert {
-        border-radius: 15px;
-        background: linear-gradient(135deg, 
-                    rgba(255, 255, 255, 0.95), 
-                    rgba(255, 245, 250, 0.95));
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 182, 193, 0.3);
-        box-shadow: 0 4px 20px rgba(255, 105, 180, 0.15);
-    }
-    
-    /* Progress bar avec dégradé rose */
-    .stProgress > div > div {
-        background: linear-gradient(90deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
-        box-shadow: 0 2px 10px rgba(255, 20, 147, 0.4);
-    }
-    
-    /* Download button doré */
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%) !important;
+    .eval-button a {
+        display: inline-block;
+        background: linear-gradient(135deg, #FFD700, #FFA500);
         color: #8B4513 !important;
-        border-radius: 15px;
-        padding: 14px 28px;
-        font-weight: 700;
-        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-        border: 2px solid rgba(255, 215, 0, 0.3);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        padding: 20px 50px;
+        border-radius: 20px;
+        font-size: 1.5rem;
+        font-weight: 900;
+        text-decoration: none;
+        box-shadow: 0 12px 35px rgba(255,215,0,0.5);
+        transition: all 0.4s;
+        text-align: center;
     }
-    
-    .stDownloadButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
-        background: linear-gradient(135deg, #FFA500 0%, #FFD700 50%, #FFDF00 100%) !important;
-    }
-    
-    /* Metrics avec effet carte */
-    [data-testid="stMetricValue"] {
-        color: #FF1493;
-        font-weight: 800;
-        text-shadow: 1px 1px 2px rgba(255, 105, 180, 0.2);
-    }
-    
-    hr {
-        border: none;
-        height: 2px;
-        background: linear-gradient(90deg, 
-                    transparent 0%, 
-                    rgba(255, 105, 180, 0.5) 50%, 
-                    transparent 100%);
-        margin: 2rem 0;
-    }
-    
-    img {
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    img:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
-    }
-    
-    /* Style pour les iframes */
-    iframe {
-        border-radius: 15px;
-        border: 2px solid rgba(255, 182, 193, 0.3);
-        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.2);
+    .eval-button a:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 25px 50px rgba(255,215,0,0.7);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Configuration des catégories
+# ===================== CATÉGORIES AVEC LIENS DIRECTS =====================
 CATEGORIES = {
-    "Men's Clothing 👔": {
+    "Vêtements Homme": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
-        "icon": "👔",
-        "column": "type_habits",
-        "color": "#667eea"
+        "icon": "Men's Clothing",
+        "column": "type_vetement"
     },
-    "Men's Shoes 👞": {
+    "Chaussures Homme": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
-        "icon": "👞",
-        "column": "type_shoes",
-        "color": "#764ba2"
+        "icon": "Men's Shoes",
+        "column": "type_chaussure"
     },
-    "Children's Clothing 👶": {
+    "Vêtements Enfants": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
-        "icon": "👶",
-        "column": "type_clothes",
-        "color": "#f093fb"
+        "icon": "Children's Clothing",
+        "column": "type_vetement_enfant"
     },
-    "Children's Shoes 👟": {
+    "Chaussures Enfants": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
-        "icon": "👟",
-        "column": "type_shoes",
-        "color": "#4facfe"
+        "icon": "Children's Shoes",
+        "column": "type_chaussure_enfant"
     }
 }
 
-# Fonction de scraping
+# ===================== FONCTIONS SCRAPING =====================
 def scrape_category(url, num_pages, column_name):
-    """Scrape a specific category"""
     data = []
-    
-    for i in range(num_pages):
+    for page in range(1, num_pages + 1):
         try:
-            page_url = f'{url}?page={i}'
-            res = get(page_url)
+            res = get(f"{url}?page={page}", headers={"User-Agent": "Mozilla/5.0"})
             soup = bs(res.content, 'html.parser')
-            containers = soup.find_all('div', class_='col s6 m4 l3')
-            
-            for container in containers:
+            items = soup.find_all('div', class_='col s6 m4 l3')
+            for item in items:
                 try:
-                    item_type = container.find('p', 'ad__card-description').text.strip()
-                    price = container.find('p', class_='ad__card-price').text.replace('CFA', '').strip()
-                    adress = container.find('p', class_='ad__card-location').text.strip()
-                    img = (container.find('img', class_='ad__card-img'))['src']
-                    
-                    dic = {
-                        column_name: item_type,
-                        'price': price,
-                        'adress': adress,
-                        'img': img
-                    }
-                    data.append(dic)
-                except:
-                    pass
-        except:
-            pass
-    
+                    title = item.find('p', class_='ad__card-description').text.strip()
+                    price = item.find('p', class_='ad__card-price').text.replace('CFA','').strip()
+                    location = item.find('p', class_='ad__card-location').text.strip()
+                    img = item.find('img', class_='ad__card-img')['src']
+                    data.append({
+                        column_name: title,
+                        "Prix": price,
+                        "Lieu": location,
+                        "Image": img
+                    })
+                except: pass
+        except: pass
     return pd.DataFrame(data)
 
-def clean_price(price_str):
-    """Clean and convert prices to float"""
+def clean_price(p):
     try:
-        cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
-        return float(cleaned) if cleaned.isdigit() else 0
+        return float(str(p).replace(' ','').replace(',','').replace('.',''))
     except:
         return 0
 
-def create_charts_for_category(df, cat_name, cat_color):
-    """Create charts for a category using matplotlib"""
-    
-    # Clean prices
-    df['price_numeric'] = df['price'].apply(clean_price)
-    df_clean = df[df['price_numeric'] > 0]
-    
-    if len(df_clean) == 0:
-        st.warning(f"No valid price data for {cat_name}")
-        return
-    
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    
-    # Set style
-    sns.set_style("whitegrid")
-    
-    # Create figure with subplots
-    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=0.995)
-    
-    # 1. KDE Plot
-    prices = df_clean['price_numeric'].values
-    axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black')
-    kde = stats.gaussian_kde(prices)
-    x_range = np.linspace(prices.min(), prices.max(), 200)
-    axes[0, 0].plot(x_range, kde(x_range) * len(prices) * (prices.max() - prices.min()) / 50, 
-                    color=cat_color, linewidth=3, label='KDE')
-    axes[0, 0].set_title('Price Distribution (KDE)', fontsize=14, fontweight='bold')
-    axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
-    axes[0, 0].set_ylabel('Frequency', fontsize=12)
-    axes[0, 0].legend()
-    axes[0, 0].grid(True, alpha=0.3)
-    
-    # 2. Top 10 Locations
-    top_locations = df['adress'].value_counts().head(10)
-    axes[0, 1].barh(range(len(top_locations)), top_locations.values, color=cat_color)
-    axes[0, 1].set_yticks(range(len(top_locations)))
-    axes[0, 1].set_yticklabels(top_locations.index, fontsize=10)
-    axes[0, 1].set_title('Top 10 Locations', fontsize=14, fontweight='bold')
-    axes[0, 1].set_xlabel('Number of Ads', fontsize=12)
-    axes[0, 1].grid(True, alpha=0.3, axis='x')
-    
-    # 3. Box Plot
-    bp = axes[1, 0].boxplot(df_clean['price_numeric'], vert=True, patch_artist=True,
-                            showmeans=True, meanline=True)
-    for patch in bp['boxes']:
-        patch.set_facecolor(cat_color)
-        patch.set_alpha(0.7)
-    axes[1, 0].set_title('Price Box Plot', fontsize=14, fontweight='bold')
-    axes[1, 0].set_ylabel('Price (CFA)', fontsize=12)
-    axes[1, 0].grid(True, alpha=0.3, axis='y')
-    
-    # 4. Quartile Distribution
-    quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'])
-    quartile_counts = quartiles.value_counts().sort_index()
-    axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
-    axes[1, 1].set_xticks(range(len(quartile_counts)))
-    axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
-    axes[1, 1].set_title('Price Distribution by Quartile', fontsize=14, fontweight='bold')
-    axes[1, 1].set_xlabel('Quartile', fontsize=12)
-    axes[1, 1].set_ylabel('Count', fontsize=12)
-    axes[1, 1].grid(True, alpha=0.3, axis='y')
-    
-    plt.tight_layout()
-    return fig
-
-# Sidebar
+# ===================== SIDEBAR =====================
 with st.sidebar:
-    st.markdown("## 🛍️ User Input Features")
-    st.markdown("---")
+    st.markdown("<h2 style='color:#8B4513; text-align:center;'>Configuration</h2>", unsafe_allow_html=True)
+    selected_category = st.selectbox("Catégorie à scraper", list(CATEGORIES.keys()))
+    num_pages = st.slider("Nombre de pages", 1, 50, 10)
     
-    st.markdown("### Category")
-    selected_category = st.selectbox(
-        "Choose a category",
-        list(CATEGORIES.keys()),
-        key="category_select"
-    )
-    
-    st.markdown("### Pages Indexes")
-    num_pages = st.selectbox(
-        "Number of pages",
-        options=[5, 10, 15, 20, 25, 30, 50, 75, 100, 120],
-        index=0,
-        key="pages_select"
-    )
-    
-    st.markdown("---")
-    st.markdown("### Options")
-    
-    option_choice = st.selectbox(
-        "Choose an option",
-        [
-            "Scrape data using BeautifulSoup",
-            "Download scraped data",
-            "Dashboard of the data",
-            "Evaluate the App"
-        ],
-        key="option_select"
-    )
-    
-    st.markdown("---")
-    st.markdown("### 📊 Info")
-    st.info(f"**Category:** {selected_category}\n\n**Pages:** {num_pages}")
+    option = st.radio("Que veux-tu faire ?", [
+        "Scraper les données",
+        "Télécharger les données",
+        "Voir le tableau de bord",
+        "Évaluer l'application"
+    ])
 
-# Zone principale
-st.markdown('<h1 class="main-title">🛍️ Coinafrique Multi-Category Scraper</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Scrape data from 4 categories: men\'s clothing, men\'s shoes, children\'s clothing and children\'s shoes from coinafrique.com</p>', unsafe_allow_html=True)
+# ===================== HEADER =====================
+st.markdown('<h1 class="main-title">Coinafrique Scraper Sénégal 2025</h1>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; font-size:1.3rem; color:#555;'>Scraping intelligent des catégories mode & chaussures sur Coinafrique.sn</p>", unsafe_allow_html=True)
 
-st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, scipy, matplotlib, seaborn")
-st.markdown("**Data source:** [Coinafrique Senegal](https://sn.coinafrique.com)")
+# ===================== DATA SOURCE AVEC LIENS =====================
+st.markdown("### Data source: Coinafrique Sénégal")
+cols = st.columns(len(CATEGORIES))
+for idx, (name, info) in enumerate(CATEGORIES.items()):
+    with cols[idx]:
+        st.markdown(f"[{info['icon']} {name}]({info['url']})", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Logique selon l'option choisie
-if option_choice == "Scrape data using BeautifulSoup":
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        category_info = CATEGORIES[selected_category]
-        if st.button(f"{category_info['icon']} Scrape {selected_category}"):
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            start_time = time.time()
-            status_text.markdown(f"**⏳ Scraping {selected_category} in progress...**")
-            
-            df = scrape_category(
-                category_info['url'], 
-                num_pages, 
-                category_info['column']
-            )
-            
-            elapsed_time = time.time() - start_time
-            progress_bar.progress(1.0)
-            status_text.markdown(f"**✅ Scraping completed in {elapsed_time:.2f} seconds!**")
-            
+# ===================== LOGIQUE PRINCIPALE =====================
+category_info = CATEGORIES[selected_category]
+key = selected_category
+
+if option == "Scraper les données":
+    if st.button(f"Scraper {selected_category} ({num_pages} pages)", use_container_width=True):
+        with st.spinner(f"Scraping en cours... {num_pages} pages"):
+            df = scrape_category(category_info["url"], num_pages, category_info["column"])
             if not df.empty:
-                st.session_state[f'scraped_data_{selected_category}'] = df
-                st.session_state['current_category'] = selected_category
-                st.session_state['num_pages'] = num_pages
-                st.session_state['elapsed_time'] = elapsed_time
+                st.session_state[key] = df
+                st.success(f"Scraping terminé ! {len(df)} annonces récupérées")
             else:
-                st.error("❌ No data retrieved.")
+                st.error("Aucune donnée récupérée. Vérifie ta connexion ou le site.")
 
-elif option_choice == "Download scraped data":
-    available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
-    
-    if available_data:
-        st.success(f"✅ {len(available_data)} category(ies) available for download")
-        
-        for cat_name in available_data:
-            df = st.session_state[f'scraped_data_{cat_name}']
-            csv = df.to_csv(index=False).encode('utf-8')
-            
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                st.download_button(
-                    label=f"📥 Download {cat_name} ({len(df)} rows)",
-                    data=csv,
-                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}.csv",
-                    mime="text/csv",
-                    use_container_width=True,
-                    key=f"download_{cat_name}"
-                )
-    else:
-        st.warning("⚠️ No scraped data available. Please scrape data first.")
-
-elif option_choice == "Dashboard of the data":
-    available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
-    
-    if available_data:
-        st.markdown("## 📊 Data Dashboard")
-        
-        for cat_name in available_data:
-            df = st.session_state[f'scraped_data_{cat_name}']
-            cat_info = CATEGORIES[cat_name]
-            
-            st.markdown(f"### {cat_info['icon']} {cat_name}")
-            
-            # Metrics
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.metric("Total Ads", len(df), "📦")
-            with col2:
-                st.metric("Unique Locations", df['adress'].nunique(), "📍")
-            with col3:
-                try:
-                    df['price_numeric'] = df['price'].apply(clean_price)
-                    avg_price = df[df['price_numeric'] > 0]['price_numeric'].mean()
-                    st.metric("Average Price", f"{avg_price:,.0f} CFA", "💰")
-                except:
-                    st.metric("Average Price", "N/A", "💰")
-            with col4:
-                try:
-                    median_price = df[df['price_numeric'] > 0]['price_numeric'].median()
-                    st.metric("Median Price", f"{median_price:,.0f} CFA", "📊")
-                except:
-                    st.metric("Median Price", "N/A", "📊")
-            
-            # Charts
-            fig = create_charts_for_category(df, cat_name, cat_info['color'])
-            if fig:
-                st.pyplot(fig)
-            
-            st.markdown("---")
-    else:
-        st.warning("⚠️ No data available. Please scrape data first.")
-
-elif option_choice == "Evaluate the App":
-    st.markdown("## ⭐ App Evaluation")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### 📝 Google Forms")
-        st.markdown("Evaluate our app via Google Forms:")
-        st.markdown("[![Google Forms](https://img.shields.io/badge/Google%20Forms-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog)")
-        
-        # Google Forms iframe
-        st.components.v1.iframe(
-            "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?embedded=true",
-            height=800,
-            scrolling=True
-        )
-    
-    with col2:
-        st.markdown("### 📋 KoboToolbox")
-        st.markdown("Or use KoboToolbox:")
-        st.markdown("[![KoboToolbox](https://img.shields.io/badge/KoboToolbox-00A79D?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6Ii8+PC9zdmc+)](https://ee.kobotoolbox.org/x/LNbLn5W1)")
-        
-        # KoboToolbox iframe
-        st.components.v1.iframe(
-            "https://ee.kobotoolbox.org/x/LNbLn5W1",
-            height=800,
-            scrolling=True
-        )
-
-# Affichage des données si elles existent
-if 'current_category' in st.session_state and option_choice == "Scrape data using BeautifulSoup":
-    cat_name = st.session_state['current_category']
-    df = st.session_state[f'scraped_data_{cat_name}']
-    num_pages = st.session_state.get('num_pages', 0)
-    
-    st.markdown("---")
-    st.markdown(f"## 📊 Results: {cat_name}")
-    st.markdown(f"**Data dimension:** {len(df)} rows and {len(df.columns)} columns.")
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Display table
-    st.dataframe(df, use_container_width=True, height=400)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Download button
-    csv = df.to_csv(index=False).encode('utf-8')
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+elif option == "Télécharger les données":
+    if key in st.session_state:
+        df = st.session_state[key]
+        csv = df.to_csv(index=False).encode()
         st.download_button(
-            label="📥 Download data as CSV",
-            data=csv,
-            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}_{num_pages}pages.csv",
-            mime="text/csv",
+            "Télécharger en CSV",
+            csv,
+            f"coinafrique_{selected_category.lower().replace(' ', '_')}.csv",
+            "text/csv",
             use_container_width=True
         )
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
-    # Image gallery
-    st.markdown("### 🖼️ Preview of Items")
-    cols = st.columns(5)
-    for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
-        with col:
-            st.image(row.img, use_container_width=True)
-            st.caption(f"💰 {row.price} CFA")
-            st.caption(f"📍 {row.adress[:15]}...")
+    else:
+        st.warning("Aucune donnée scrapée pour le moment.")
+
+elif option == "Voir le tableau de bord":
+    if key in st.session_state:
+        df = st.session_state[key]
+        st.dataframe(df, use_container_width=True, height=500)
+        
+        col1, col2, col3 = st.columns(3)
+        df['price_num'] = df['Prix'].apply(clean_price)
+        clean = df[df['price_num'] > 0]
+        col1.metric("Annonces", len(df))
+        col2.metric("Prix moyen", f"{clean['price_num'].mean():,.0f} CFA")
+        col3.metric("Lieux différents", df['Lieu'].nunique())
+        
+        st.markdown("### Aperçu des articles")
+        cols = st.columns(5)
+        for i, row in df.head(10).iterrows():
+            with cols[i%5]:
+                st.image(row['Image'], use_column_width=True)
+                st.caption(f"{row['Prix']} CFA\n{row['Lieu']}")
+    else:
+        st.warning("Scrape d'abord des données !")
+
+elif option == "Évaluer l'application":
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align:center;'>
+        <h2>Donne-nous ton avis !</h2>
+        <p>Ton retour nous aide à améliorer l'outil</p>
+        <div class='eval-button'>
+            <a href='https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform' target='_blank'>
+                Évaluer l'application maintenant
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ===================== FIN =====================
+st.markdown("<br><hr><p style='text-align:center; color:#888; font-size:0.9rem;'>Made with Streamlit + BeautifulSoup • 2025</p>", unsafe_allow_html=True)
