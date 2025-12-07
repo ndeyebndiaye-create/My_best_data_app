@@ -1,32 +1,12 @@
 ## Fichier: .streamlit/config.toml
 
 [theme]
-# Activer le thème personnalisé
+# Définit le thème de base pour partir d'une interface claire
 base = "light"
 
-# Couleurs de base : Pour correspondre à votre thème élégant
-primaryColor = "#FF69B4"       # Rose vif (utilisé pour les boutons et les liens)
-backgroundColor = "#F0F8FF"    # AliceBlue ou très clair (le fond principal est géré par le CSS)
-secondaryBackgroundColor = "#FFF0F5" # Blush / Lavande très clair (pour les sidebar et les blocs secondaires)
-textColor = "#333333"          # Gris foncé pour le texte principal
+# Couleurs personnalisées pour le thème Vert d'Eau (Teal)
+primaryColor = "#008080"       # Vert d'Eau foncé (couleur principale des boutons, liens)
+backgroundColor = "#F0FFFF"    # Fond très clair (Azure Light, correspond au fond global)
+secondaryBackgroundColor = "#E0FFFF" # Cyan très pâle (pour la barre latérale et les blocs secondaires)
+textColor = "#333333"          # Couleur de texte Gris foncé et professionnel
 font = "sans serif"
-
-# Couleurs de l'interface utilisateur
-# Ces couleurs définissent l'apparence des widgets, des messages d'alerte, etc.
-# Elles sont importantes pour l'accessibilité.
-
-# Couleur des bordures des widgets, des lignes de séparation
-[ui]
-widgetColor = "#FFC0CB" # Light Pink / Bordures claires
-
-# Couleur des messages de succès (st.success)
-successColor = "#28A745"
-
-# Couleur des messages d'information (st.info)
-infoColor = "#17A2B8"
-
-# Couleur des messages d'avertissement (st.warning)
-warningColor = "#FFC107"
-
-# Couleur des messages d'erreur (st.error)
-dangerColor = "#DC3545"
