@@ -14,224 +14,347 @@ KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 
 # Page Configuration
 st.set_page_config(
-    page_title="Coinafrique Scraper - Multi-Categories",
-    page_icon="📊", 
-    layout="wide"
+    page_title="Coinafrique Scraper Pro",
+    page_icon="🛍️", 
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# --- NOUVELLE PALETTE DE COULEURS PROFESSIONNELLE ---
-# Thème principal: Vert d'Eau / Teal (frais, confiant)
-TEAL_DARK = "#008080"       # Vert d'Eau foncé
-TEAL_LIGHT = "#00CCCC"      # Cyan / Vert d'Eau clair
-
-# Couleur Secondaire: Gris-Bleu (professionnel, apaisant)
-SECONDARY_BLUE_GRAY = "#607D8B" 
-
-# Couleur d'Accent: Vert Citron (pour l'énergie et les actions clés)
-ACCENT_LIME = "#CDDC39" 
-
-# Couleurs de Fond
-MAIN_BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1542744173-05336fcc7ad4?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" # Image de bureau/market
-WELCOME_BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1576759795078-7d8b5c9b9804?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" # Image d'entrepôt/logistique claire
-BACKGROUND_COLOR_OVERLAY = "rgba(240, 255, 255, 0.95)" # Opacité très légère pour laisser voir l'image
-CARD_COLOR = "#FFFFFF"     
-
-# Custom CSS with modern Teal/Aquamarine design and professional accents
-st.markdown(f"""
+# Modern Professional CSS with Fashion Theme
+st.markdown("""
 <style>
-    /* 1. GLOBAL BACKGROUND (Scraping & Dashboard) */
-    .stApp {{
-        background: linear-gradient({BACKGROUND_COLOR_OVERLAY}, {BACKGROUND_COLOR_OVERLAY}),
-                    url('{MAIN_BACKGROUND_IMAGE}');
-        background-size: cover;
-        background-attachment: fixed;
-        background-position: center;
-        color: #333333;
-    }}
-
-    /* 2. SIDEBAR */
-    [data-testid="stSidebar"] {{
-        background-color: #F8FFFF; /* Très clair */
-        box-shadow: 4px 0 15px rgba(0,0,0,0.05);
-        color: {SECONDARY_BLUE_GRAY};
-    }}
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
     
-    /* Sidebar titles/text (Gris-Bleu) */
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    /* WELCOME PAGE - Fashion Background */
+    .welcome-container {
+        background: linear-gradient(135deg, rgba(26, 35, 126, 0.95), rgba(13, 71, 161, 0.9)),
+                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 25px;
+        padding: 4rem 2rem;
+        margin: -1rem -2rem;
+        min-height: 85vh;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .welcome-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 40px rgba(255,255,255,0.5);
+        letter-spacing: 3px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-subtitle {
+        text-align: center;
+        color: #e3f2fd;
+        font-size: 1.4rem;
+        margin-bottom: 3rem;
+        font-weight: 300;
+        line-height: 1.8;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255,255,255,0.3);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(25, 118, 210, 0.4);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1565c0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-text {
+        color: #546e7a;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    /* MAIN APP BACKGROUND */
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    /* SIDEBAR - Elegant Navy Blue */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
     [data-testid="stSidebar"] h3,
-    [data-testid="stSidebar"] label {{
-        color: {SECONDARY_BLUE_GRAY} !important;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }}
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p {
+        color: #ffffff !important;
+        font-weight: 600;
+    }
     
-    /* 3. MAIN AREA CARD */
-    .main .block-container {{
-        background-color: {CARD_COLOR};
-        border-radius: 15px;
-        padding: 2.5rem;
-        margin-top: 2rem;
-        box-shadow: 0 8px 30px rgba(0, 128, 128, 0.15);
-        border: 1px solid rgba(0, 128, 128, 0.1);
-    }}
+    [data-testid="stSidebar"] .stRadio > label {
+        background: rgba(255,255,255,0.1);
+        padding: 0.5rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+    }
     
-    /* 4. WELCOME PAGE BACKGROUND (Correction pour l'image d'accueil) */
-    .stApp > header {{
-        /* IMPORTANT: Cache le header par défaut si on veut que le conteneur prenne toute la place */
-        visibility: hidden;
-        height: 0px;
-    }}
-    #welcome-page-container {{
-        /* Définition du conteneur pour l'image de fond claire */
-        background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
-                    url('{WELCOME_BACKGROUND_IMAGE}'); 
-        background-size: cover;
-        background-position: center;
-        border-radius: 15px;
+    /* MAIN CONTENT CARD */
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
         padding: 3rem;
-        margin-top: 0rem; /* Réajusté car le header est caché */
-        box-shadow: 0 10px 40px rgba(0, 128, 128, 0.2);
-        border: 1px solid rgba(0, 128, 128, 0.2);
-    }}
-
-    /* 5. TITLES (Gradient Vert d'Eau) */
-    .welcome-title, .main-title {{
+        margin-top: 2rem;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+    
+    /* TITLES */
+    .main-title {
         font-size: 3.5rem;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(135deg, {TEAL_DARK} 0%, {TEAL_LIGHT} 100%); 
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #42a5f5 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
-        text-shadow: 1px 1px 4px rgba(0, 128, 128, 0.3);
-        letter-spacing: 1px;
-    }}
-
-    .subtitle {{
+        letter-spacing: 2px;
+    }
+    
+    .subtitle {
         text-align: center;
-        color: {SECONDARY_BLUE_GRAY};
-        font-size: 1.1rem;
+        color: #546e7a;
+        font-size: 1.2rem;
         margin-bottom: 2rem;
-        line-height: 1.6;
         font-weight: 400;
-    }}
+        line-height: 1.7;
+    }
     
-    /* 6. PRIMARY BUTTON (Scraping) - Vert d'Eau Principal */
-    .stButton>button {{
-        background: linear-gradient(135deg, {TEAL_DARK} 0%, {TEAL_LIGHT} 100%) !important;
+    /* BUTTONS - Primary (Scrape) */
+    .stButton>button {
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%) !important;
         color: white !important;
         font-weight: 700;
         border: none;
-        border-radius: 8px;
-        padding: 15px 30px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
+        border-radius: 12px;
+        padding: 18px 40px;
+        font-size: 1.1rem;
+        transition: all 0.4s ease;
         width: 100%;
-        box-shadow: 0 4px 15px rgba(0, 128, 128, 0.4);
+        box-shadow: 0 8px 25px rgba(21, 101, 192, 0.4);
         text-transform: uppercase;
-        letter-spacing: 1px;
-    }}
+        letter-spacing: 1.5px;
+    }
     
-    .stButton>button:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 128, 128, 0.6);
-    }}
-
-    /* 7. ACCENT BUTTONS (Évaluation) - Vert Citron pour le contraste */
-    #button-evaluate-google > button, 
-    #button-evaluate-kobo > button,
-    .stDownloadButton > button {{
-        background: linear-gradient(135deg, {ACCENT_LIME} 0%, #AECB29 100%) !important;
-        color: {SECONDARY_BLUE_GRAY} !important;
-        font-weight: 700;
-        border-radius: 8px;
-        padding: 15px 30px;
-        box-shadow: 0 4px 15px rgba(205, 220, 57, 0.4);
-        border: none;
-        text-transform: uppercase;
-    }}
+    .stButton>button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(21, 101, 192, 0.6);
+        background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%) !important;
+    }
     
-    #button-evaluate-google > button:hover, 
-    #button-evaluate-kobo > button:hover,
-    .stDownloadButton > button:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(205, 220, 57, 0.6);
+    /* START BUTTON (Welcome Page) */
+    .start-button {
+        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
+        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.5);
+    }
+    
+    .start-button:hover {
+        background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%) !important;
+        box-shadow: 0 15px 40px rgba(76, 175, 80, 0.7);
+    }
+    
+    /* DOWNLOAD BUTTON */
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%) !important;
         color: white !important;
-    }}
-    
-    /* 8. METRICS */
-    [data-testid="stMetricValue"] {{
-        color: {TEAL_DARK};
-        font-weight: 800;
-    }}
-    
-    /* 9. ALERTS/INFO */
-    .stAlert {{
-        border-radius: 8px;
-        border-left: 5px solid {SECONDARY_BLUE_GRAY}; /* Utilisation du Gris-Bleu pour les infos */
-        background-color: #F8FFFF;
-    }}
-    
-    /* 10. SÉPARATEUR */
-    hr {{
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 15px 30px;
+        box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
         border: none;
-        height: 1px;
-        background-color: rgba(96, 125, 139, 0.2); /* Gris-Bleu clair */
-        margin: 1.5rem 0;
-    }}
+        text-transform: uppercase;
+    }
     
-    /* Autres éléments (images, progress bar) restent en Vert d'Eau */
-    .stProgress > div > div {{
-        background-color: {TEAL_LIGHT};
-    }}
+    .stDownloadButton > button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 152, 0, 0.6);
+    }
     
+    /* METRICS */
+    [data-testid="stMetricValue"] {
+        color: #1565c0;
+        font-weight: 800;
+        font-size: 2rem;
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: #546e7a;
+        font-weight: 600;
+    }
+    
+    /* ALERTS */
+    .stAlert {
+        border-radius: 12px;
+        border-left: 5px solid #1976d2;
+        background: rgba(25, 118, 210, 0.05);
+    }
+    
+    /* PROGRESS BAR */
+    .stProgress > div > div {
+        background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%);
+        border-radius: 10px;
+    }
+    
+    /* DATAFRAME */
+    [data-testid="stDataFrame"] {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    /* IMAGES */
+    img {
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 35px rgba(21, 101, 192, 0.3);
+    }
+    
+    /* SEPARATOR */
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #1976d2 50%, transparent 100%);
+        margin: 2rem 0;
+    }
+    
+    /* LINK BUTTONS (Evaluation) */
+    .stLinkButton > a {
+        background: linear-gradient(135deg, #00897b 0%, #26a69a 100%) !important;
+        color: white !important;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 15px 30px;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 137, 123, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .stLinkButton > a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 137, 123, 0.6);
+    }
+    
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animated {
+        animation: fadeInUp 0.8s ease-out;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Category Configuration (Pas de changement des catégories, pas d'emojis)
+# Category Configuration
 CATEGORIES = {
     "Men's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
         "icon": "👔",
         "column": "type_habits",
-        "color": "#008080" 
+        "color": "#1565c0"
     },
     "Men's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
         "icon": "👞",
         "column": "type_shoes",
-        "color": "#009999" 
+        "color": "#1976d2"
     },
     "Children's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
         "icon": "👶",
         "column": "type_clothes",
-        "color": "#00B3B3" 
+        "color": "#42a5f5"
     },
     "Children's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
         "icon": "👟",
         "column": "type_shoes",
-        "color": "#00CCCC" 
+        "color": "#64b5f6"
     }
 }
 
-# --- Scraping and Chart Functions (Non inclus ici pour la concision, mais non modifiés) ---
-# ... (Vos fonctions scrape_category, clean_price, create_charts_for_category) ...
-
-# --- SIDEBAR (Non modifiée, sans emojis) ---
-# ... (Le code de la sidebar) ...
-
-# --- MAIN CONTENT AREA (Seules les balises HTML ont été mises à jour) ---
-
-# --- DÉBUT DES FONCTIONS PYTHON ---
-
+# Functions
 def scrape_category(url, num_pages, column_name):
     data = []
     for i in range(num_pages):
         try:
-            time.sleep(0.5) 
+            time.sleep(0.5)
             page_url = f'{url}?page={i}'
             res = get(page_url)
             soup = bs(res.content, 'html.parser')
@@ -298,8 +421,6 @@ def create_charts_for_category(df, cat_name, cat_color):
         axes[0, 1].set_title('Top 10 Locations', fontsize=14, fontweight='bold')
         axes[0, 1].set_xlabel('Number of Ads', fontsize=12)
         axes[0, 1].grid(True, alpha=0.3, axis='x')
-    else:
-        axes[0, 1].text(0.5, 0.5, 'No Location Data', ha='center', va='center')
     
     # 3. Box Plot
     bp = axes[1, 0].boxplot(df_clean['price_numeric'], vert=True, patch_artist=True,
@@ -307,16 +428,15 @@ def create_charts_for_category(df, cat_name, cat_color):
     for patch in bp['boxes']:
         patch.set_facecolor(cat_color)
         patch.set_alpha(0.7)
-    axes[1, 0].set_title('Price Box Plot (Outliers Included)', fontsize=14, fontweight='bold')
+    axes[1, 0].set_title('Price Box Plot', fontsize=14, fontweight='bold')
     axes[1, 0].set_ylabel('Price (CFA)', fontsize=12)
     axes[1, 0].grid(True, alpha=0.3, axis='y')
     
     # 4. Quartile Distribution
-    if len(df_clean['price_numeric'].unique()) >= 4 and len(df_clean) >= 4:
+    if len(df_clean['price_numeric'].unique()) >= 4:
         try:
             quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'], duplicates='drop')
-            quartile_counts = quartiles.value_counts().sort_index() 
-            
+            quartile_counts = quartiles.value_counts().sort_index()
             axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
             axes[1, 1].set_xticks(range(len(quartile_counts)))
             axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
@@ -324,189 +444,170 @@ def create_charts_for_category(df, cat_name, cat_color):
             axes[1, 1].set_xlabel('Quartile', fontsize=12)
             axes[1, 1].set_ylabel('Count', fontsize=12)
             axes[1, 1].grid(True, alpha=0.3, axis='y')
-        except ValueError as e:
-            axes[1, 1].text(0.5, 0.5, f'Quartile error: {e}', ha='center', va='center', fontsize=10)
-    else:
-        axes[1, 1].text(0.5, 0.5, 'Not enough unique prices for Quartile analysis', ha='center', va='center')
+        except:
+            axes[1, 1].text(0.5, 0.5, 'Not enough data for quartiles', ha='center', va='center')
     
     plt.tight_layout()
     return fig
 
-# --- DÉBUT DU FLUX STREAMLIT ---
-
-# --- SIDEBAR ---
-st.sidebar.markdown("## Navigation")
+# SIDEBAR
+st.sidebar.markdown("##  Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
-    ["1. Welcome & Guide", "2. Scrape & Analyze"],
+    ["🏠 Welcome", " Scrape & Analyze"],
     index=0
 )
 
-if page_selection == "2. Scrape & Analyze":
+if page_selection == "Scrape & Analyze":
     st.sidebar.markdown("---")
-    st.sidebar.markdown("## User Input Features")
+    st.sidebar.markdown("## ⚙️ Settings")
     
-    st.sidebar.markdown("### Category Selection")
     selected_category = st.sidebar.selectbox(
-        "Choose a category",
+        " Category",
         list(CATEGORIES.keys()),
         key="category_select"
     )
     
-    st.sidebar.markdown("### Pages Indexes")
-    
     num_pages = st.sidebar.number_input(
-        "Number of pages to scrape (Max 120)",
+        "📄 Pages to scrape",
         min_value=1,
-        max_value=120, 
+        max_value=120,
         value=5,
-        step=1,
-        key="pages_number_input"
+        step=1
     )
     
-    num_pages = int(num_pages)
-    
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### Options")
-    
     option_choice = st.sidebar.selectbox(
-        "Choose an option",
+        "🎯 Action",
         [
             "Scrape data using BeautifulSoup",
             "Download scraped data",
             "Data Dashboard",
             "Evaluate the App"
-        ],
-        key="option_select"
+        ]
     )
     
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### Info")
-    st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {num_pages}")
-else:
-    selected_category = list(CATEGORIES.keys())[0]
-    num_pages = 5
-    option_choice = "Scrape data using BeautifulSoup"
-# --- FIN SIDEBAR ---
+    st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {int(num_pages)}")
 
-# --- MAIN CONTENT AREA ---
-
-if page_selection == "1. Welcome & Guide":
+# MAIN CONTENT
+if page_selection == "🏠 Welcome":
+    st.markdown('<div class="welcome-container animated">', unsafe_allow_html=True)
     
-    with st.container(border=False):
-        # Le conteneur qui reçoit l'image de fond (corrigée par le CSS)
-        st.markdown('<div id="welcome-page-container">', unsafe_allow_html=True) 
-        
-        st.markdown('<h1 class="welcome-title">Welcome to the Coinafrique Scraper</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="subtitle">Your dedicated tool for **online sales market analysis** on Coinafrique Senegal. Prepare your market studies with precision and clarity.</p>', unsafe_allow_html=True)
-
-        st.image(
-            "https://images.unsplash.com/photo-1601004928014-998875a6c8e3?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            caption="Clear view of market and sales context.",
-            use_column_width=True
-        )
-        
-        st.markdown("---")
-        
-        st.markdown("## How to Use the App")
+    st.markdown('<h1 class="welcome-title"> Coinafrique Scraper Pro</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="welcome-subtitle">Your Professional Tool for Fashion & Footwear Market Analysis in Senegal</p>', unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
         st.markdown("""
-        1.  **Change Page**: In the sidebar on the left, select **"2. Scrape & Analyze"**.
-        2.  **Select Category**: Choose the product category you want to analyze.
-        3.  **Define Number of Pages**: Enter the number of pages to scrape.
-        4.  **Start Scraping**: Click the main button to collect data.
-        5.  **Analyze**: Use the **"Data Dashboard"** or **"Download scraped data"** options to visualize or export the results.
-        """)
-        st.markdown("---")
-        st.info("**Ready to start?** Go to the **'2. Scrape & Analyze'** tab to launch your first market study.")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-
-else: 
+        <div class="feature-card">
+            <span class="feature-icon"></span>
+            <h3 class="feature-title">Smart Scraping</h3>
+            <p class="feature-text">Extract data from thousands of fashion listings with advanced web scraping technology.</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    cat_info = CATEGORIES[selected_category]
-    st.markdown('<h1 class="main-title">Coinafrique Multi-Category Scraper</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="subtitle">Scrape data from 4 categories on coinafrique.com: men\'s clothing, men\'s shoes, children\'s clothing and children\'s shoes.</p>', unsafe_allow_html=True)
-    st.markdown("**Python libraries:** pandas, streamlit, requests, bs4, scipy, matplotlib, seaborn")
-
-    st.markdown(f"**Data source:** [{selected_category}]({cat_info['url']})") 
-
+    with col2:
+        st.markdown("""
+        <div class="feature-card">
+            <span class="feature-icon"></span>
+            <h3 class="feature-title">Deep Analytics</h3>
+            <p class="feature-text">Visualize price distributions, top locations, and market trends with interactive charts.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="feature-card">
+            <span class="feature-icon"></span>
+            <h3 class="feature-title">Easy Export</h3>
+            <p class="feature-text">Download your data in CSV format for further analysis in Excel or other tools.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.markdown("<br>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div class="feature-card" style="text-align: center;">
+            <h3 class="feature-title">🚀 Ready to Start?</h3>
+            <p class="feature-text">Analyze 4 categories: Men's Clothing, Men's Shoes, Children's Clothing, and Children's Shoes</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🎬 START SCRAPING NOW", key="start", help="Click to begin"):
+            st.session_state.page = "📊 Scrape & Analyze"
+            st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
+else:
+    cat_info = CATEGORIES[selected_category]
+    st.markdown('<h1 class="main-title animated">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitle">Extract and analyze fashion market data from Coinafrique Senegal</p>', unsafe_allow_html=True)
+    
+    st.markdown(f"**Category:** {selected_category} | **Source:** [View on Coinafrique]({cat_info['url']})")
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     if option_choice == "Scrape data using BeautifulSoup":
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            if st.button(f"Scrape Data for {selected_category}"):
+            if st.button(f"{cat_info['icon']} SCRAPE {selected_category.upper()}", use_container_width=True):
                 progress_bar = st.progress(0)
                 status_text = st.empty()
                 
                 start_time = time.time()
-                status_text.markdown(f"**Scraping {selected_category} in progress...**")
+                status_text.markdown(f"**⏳ Scraping {selected_category}...**")
                 
-                df = scrape_category(
-                    cat_info['url'],
-                    num_pages,
-                    cat_info['column']
-                )
+                df = scrape_category(cat_info['url'], int(num_pages), cat_info['column'])
                 
                 elapsed_time = time.time() - start_time
                 progress_bar.progress(1.0)
-                status_text.markdown(f"**Scraping completed in {elapsed_time:.2f} seconds.**")
+                status_text.markdown(f"**✅ Completed in {elapsed_time:.2f}s | {len(df)} items found**")
                 
                 if not df.empty:
                     st.session_state[f'scraped_data_{selected_category}'] = df
                     st.session_state['current_category'] = selected_category
-                    st.session_state['num_pages'] = num_pages
-                    st.session_state['elapsed_time'] = elapsed_time
-                    st.success(f"Successfully scraped **{len(df)}** rows of data.")
+                    st.success(f" Successfully scraped **{len(df)} products**!")
                 else:
-                    st.error("No data retrieved. The page structure may have changed or the number of pages is too low.")
+                    st.error("❌ No data found. Try increasing the number of pages.")
         
         if 'current_category' in st.session_state and st.session_state['current_category'] == selected_category:
-            cat_name = st.session_state['current_category']
-            df = st.session_state[f'scraped_data_{cat_name}']
-            num_pages_scraped = st.session_state.get('num_pages', 0)
+            df = st.session_state[f'scraped_data_{selected_category}']
             
             st.markdown("---")
-            st.markdown(f"## Results: {cat_name}")
-            st.markdown(f"**Data dimension:** {len(df)} rows and {len(df.columns)} columns.")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(f"##  Results: {selected_category}")
+            st.markdown(f"**{len(df)} rows** × **{len(df.columns)} columns**")
             
             st.dataframe(df, use_container_width=True, height=400)
             
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            csv = df.to_csv(index=False).encode('utf-8')
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
+                csv = df.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    label="Download data as CSV",
-                    data=csv,
-                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}_{num_pages_scraped}pages.csv",
-                    mime="text/csv",
+                    " DOWNLOAD CSV",
+                    csv,
+                    f"coinafrique_{selected_category.lower().replace(' ', '_')}.csv",
+                    "text/csv",
                     use_container_width=True
                 )
             
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            st.markdown("### Preview of Items")
+            st.markdown("###  Product Preview")
             cols = st.columns(5)
-            if 'img' in df.columns and not df.empty:
-                for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
-                    with col:
-                        img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
-                        st.image(img_url, use_container_width=True)
-                        st.caption(f"Price: {row.price} CFA")
-                        st.caption(f"Location: {row.adress[:15]}...")
-            else:
-                st.info("No images to display or 'img' column missing.")
-        
-
+            for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
+                with col:
+                    img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
+                    st.image(img_url, use_container_width=True)
+                    st.caption(f" {row.price} CFA")
+                    st.caption(f" {row.adress[:15]}...")
+    
     elif option_choice == "Download scraped data":
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.success(f"{len(available_data)} category(ies) available for download.")
+            st.success(f"✅ {len(available_data)} dataset(s) available")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
@@ -515,77 +616,56 @@ else:
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.download_button(
-                        label=f"Download {cat_name} ({len(df)} rows)",
-                        data=csv,
-                        file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
-                        mime="text/csv",
+                        f" {cat_name} ({len(df)} rows)",
+                        csv,
+                        f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
+                        "text/csv",
                         use_container_width=True,
-                        key=f"download_{cat_name}"
+                        key=f"dl_{cat_name}"
                     )
         else:
-            st.warning("No scraped data available. Please scrape data first.")
-            
+            st.warning("⚠️ No data available. Please scrape first.")
+    
     elif option_choice == "Data Dashboard":
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.markdown("## Data Dashboard")
+            st.markdown("##  Analytics Dashboard")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
-                cat_info_dash = CATEGORIES[cat_name]
                 
-                st.markdown(f"### {cat_name}")
+                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name}")
                 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("Total Ads", len(df))
+                    st.metric(" Total Ads", len(df))
                 with col2:
-                    st.metric("Unique Locations", df['adress'].nunique())
+                    st.metric(" Locations", df['adress'].nunique())
                 with col3:
-                    try:
-                        df['price_numeric'] = df['price'].apply(clean_price)
-                        avg_price = df[df['price_numeric'] > 0]['price_numeric'].mean()
-                        st.metric("Average Price", f"{avg_price:,.0f} CFA")
-                    except:
-                        st.metric("Average Price", "N/A")
+                    df['price_numeric'] = df['price'].apply(clean_price)
+                    avg = df[df['price_numeric'] > 0]['price_numeric'].mean()
+                    st.metric(" Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
                 with col4:
-                    try:
-                        median_price = df[df['price_numeric'] > 0]['price_numeric'].median()
-                        st.metric("Median Price", f"{median_price:,.0f} CFA")
-                    except:
-                        st.metric("Median Price", "N/A")
+                    med = df[df['price_numeric'] > 0]['price_numeric'].median()
+                    st.metric(" Median", f"{med:,.0f} CFA" if med > 0 else "N/A")
                 
-                fig = create_charts_for_category(df, cat_name, cat_info_dash['color'])
+                fig = create_charts_for_category(df, cat_name, CATEGORIES[cat_name]['color'])
                 if fig:
                     st.pyplot(fig)
                 else:
-                    st.warning("Not enough data points to generate meaningful charts for this category (needs at least 10 entries with unique prices).")
+                    st.warning("⚠️ Need at least 10 items for charts")
                 
                 st.markdown("---")
         else:
-            st.warning("No data available. Please scrape data first.")
-            
+            st.warning("⚠️ No data available. Please scrape first.")
+    
     elif option_choice == "Evaluate the App":
-        st.markdown("## App Evaluation")
-        st.markdown("Please take a moment to evaluate our application. Your feedback is valuable for its improvement.")
+        st.markdown("## ⭐ Help Us Improve")
+        st.markdown("Your feedback matters! Choose your preferred platform:")
         
         col1, col2 = st.columns(2)
-        
         with col1:
-            st.markdown('<div id="button-evaluate-google">', unsafe_allow_html=True)
-            st.link_button(
-                label="Evaluate on Google Forms",
-                url=GOOGLE_FORMS_LINK,
-                use_container_width=True
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
-            
+            st.link_button("📝 Google Forms", GOOGLE_FORMS_LINK, use_container_width=True)
         with col2:
-            st.markdown('<div id="button-evaluate-kobo">', unsafe_allow_html=True)
-            st.link_button(
-                label="Evaluate on KoboToolbox",
-                url=KOBOTOOLBOX_LINK,
-                use_container_width=True
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.link_button("📋 KoboToolbox", KOBOTOOLBOX_LINK, use_container_width=True)
