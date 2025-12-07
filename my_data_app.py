@@ -3,13 +3,12 @@ import pandas as pd
 from requests import get
 from bs4 import BeautifulSoup as bs
 import time
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import numpy as np
+from scipy import stats
 
 # Configuration de la page
 st.set_page_config(
-    page_title="Scraper Coinafrique - Multi-Catégories",
+    page_title="Coinafrique Scraper - Multi-Categories",
     page_icon="👔",
     layout="wide"
 )
@@ -210,25 +209,25 @@ st.markdown("""
 
 # Configuration des catégories
 CATEGORIES = {
-    "Vêtements Homme 👔": {
+    "Men's Clothing 👔": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
         "icon": "👔",
         "column": "type_habits",
         "color": "#667eea"
     },
-    "Chaussures Homme 👞": {
+    "Men's Shoes 👞": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
         "icon": "👞",
         "column": "type_shoes",
         "color": "#764ba2"
     },
-    "Vêtements Enfants 👶": {
+    "Children's Clothing 👶": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
         "icon": "👶",
         "column": "type_clothes",
         "color": "#f093fb"
     },
-    "Chaussures Enfants 👟": {
+    "Children's Shoes 👟": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
         "icon": "👟",
         "column": "type_shoes",
@@ -238,7 +237,7 @@ CATEGORIES = {
 
 # Fonction de scraping
 def scrape_category(url, num_pages, column_name):
-    """Scrape une catégorie spécifique"""
+    """Scrape a specific category"""
     data = []
     
     for i in range(num_pages):
@@ -270,116 +269,78 @@ def scrape_category(url, num_pages, column_name):
     return pd.DataFrame(data)
 
 def clean_price(price_str):
-    """Nettoie et convertit les prix en float"""
+    """Clean and convert prices to float"""
     try:
         cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
         return float(cleaned) if cleaned.isdigit() else 0
     except:
         return 0
 
-def create_plots_for_category(df, cat_name, cat_color):
-    """Crée les graphiques pour une catégorie"""
+def create_charts_for_category(df, cat_name, cat_color):
+    """Create charts for a category using matplotlib"""
     
-    # Nettoyer les prix
+    # Clean prices
     df['price_numeric'] = df['price'].apply(clean_price)
     df_clean = df[df['price_numeric'] > 0]
     
     if len(df_clean) == 0:
-        st.warning(f"Pas de données de prix valides pour {cat_name}")
+        st.warning(f"No valid price data for {cat_name}")
         return
     
-    # Créer une grille de graphiques 2x2
-    fig = make_subplots(
-        rows=2, cols=2,
-        subplot_titles=(
-            'Distribution KDE des Prix',
-            'Top 10 Localisations',
-            'Box Plot des Prix',
-            'Distribution des Prix par Quartile'
-        ),
-        specs=[
-            [{"type": "scatter"}, {"type": "bar"}],
-            [{"type": "box"}, {"type": "bar"}]
-        ],
-        vertical_spacing=0.15,
-        horizontal_spacing=0.1
-    )
+    import matplotlib.pyplot as plt
+    import seaborn as sns
     
-    # 1. KDE Plot (Distribution des prix)
-    from scipy import stats
-    import numpy as np
+    # Set style
+    sns.set_style("whitegrid")
     
+    # Create figure with subplots
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=0.995)
+    
+    # 1. KDE Plot
     prices = df_clean['price_numeric'].values
+    axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black')
     kde = stats.gaussian_kde(prices)
     x_range = np.linspace(prices.min(), prices.max(), 200)
-    kde_values = kde(x_range)
+    axes[0, 0].plot(x_range, kde(x_range) * len(prices) * (prices.max() - prices.min()) / 50, 
+                    color=cat_color, linewidth=3, label='KDE')
+    axes[0, 0].set_title('Price Distribution (KDE)', fontsize=14, fontweight='bold')
+    axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
+    axes[0, 0].set_ylabel('Frequency', fontsize=12)
+    axes[0, 0].legend()
+    axes[0, 0].grid(True, alpha=0.3)
     
-    fig.add_trace(
-        go.Scatter(
-            x=x_range,
-            y=kde_values,
-            fill='tozeroy',
-            name='Distribution KDE',
-            line=dict(color=cat_color, width=2),
-            fillcolor=f'rgba{tuple(list(int(cat_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.3])}'
-        ),
-        row=1, col=1
-    )
-    
-    # 2. Top 10 Localisations
+    # 2. Top 10 Locations
     top_locations = df['adress'].value_counts().head(10)
-    fig.add_trace(
-        go.Bar(
-            x=top_locations.values,
-            y=top_locations.index,
-            orientation='h',
-            name='Annonces',
-            marker=dict(color=cat_color)
-        ),
-        row=1, col=2
-    )
+    axes[0, 1].barh(range(len(top_locations)), top_locations.values, color=cat_color)
+    axes[0, 1].set_yticks(range(len(top_locations)))
+    axes[0, 1].set_yticklabels(top_locations.index, fontsize=10)
+    axes[0, 1].set_title('Top 10 Locations', fontsize=14, fontweight='bold')
+    axes[0, 1].set_xlabel('Number of Ads', fontsize=12)
+    axes[0, 1].grid(True, alpha=0.3, axis='x')
     
-    # 3. Box Plot des prix
-    fig.add_trace(
-        go.Box(
-            y=df_clean['price_numeric'],
-            name='Prix',
-            marker=dict(color=cat_color),
-            boxmean='sd'
-        ),
-        row=2, col=1
-    )
+    # 3. Box Plot
+    bp = axes[1, 0].boxplot(df_clean['price_numeric'], vert=True, patch_artist=True,
+                            showmeans=True, meanline=True)
+    for patch in bp['boxes']:
+        patch.set_facecolor(cat_color)
+        patch.set_alpha(0.7)
+    axes[1, 0].set_title('Price Box Plot', fontsize=14, fontweight='bold')
+    axes[1, 0].set_ylabel('Price (CFA)', fontsize=12)
+    axes[1, 0].grid(True, alpha=0.3, axis='y')
     
-    # 4. Distribution par quartiles
-    quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Bas)', 'Q2', 'Q3', 'Q4 (Haut)'])
+    # 4. Quartile Distribution
+    quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'])
     quartile_counts = quartiles.value_counts().sort_index()
+    axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
+    axes[1, 1].set_xticks(range(len(quartile_counts)))
+    axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
+    axes[1, 1].set_title('Price Distribution by Quartile', fontsize=14, fontweight='bold')
+    axes[1, 1].set_xlabel('Quartile', fontsize=12)
+    axes[1, 1].set_ylabel('Count', fontsize=12)
+    axes[1, 1].grid(True, alpha=0.3, axis='y')
     
-    fig.add_trace(
-        go.Bar(
-            x=quartile_counts.index,
-            y=quartile_counts.values,
-            name='Quartiles',
-            marker=dict(color=[cat_color] * len(quartile_counts))
-        ),
-        row=2, col=2
-    )
-    
-    # Mise à jour du layout
-    fig.update_xaxes(title_text="Prix (CFA)", row=1, col=1)
-    fig.update_yaxes(title_text="Densité", row=1, col=1)
-    fig.update_xaxes(title_text="Nombre d'annonces", row=1, col=2)
-    fig.update_xaxes(title_text="", row=2, col=1)
-    fig.update_yaxes(title_text="Prix (CFA)", row=2, col=1)
-    fig.update_xaxes(title_text="Quartile", row=2, col=2)
-    fig.update_yaxes(title_text="Nombre", row=2, col=2)
-    
-    fig.update_layout(
-        height=800,
-        showlegend=False,
-        title_text=f"Analyse des données - {cat_name}",
-        title_font_size=20
-    )
-    
+    plt.tight_layout()
     return fig
 
 # Sidebar
@@ -387,16 +348,16 @@ with st.sidebar:
     st.markdown("## 🛍️ User Input Features")
     st.markdown("---")
     
-    st.markdown("### Catégorie")
+    st.markdown("### Category")
     selected_category = st.selectbox(
-        "Choisir une catégorie",
+        "Choose a category",
         list(CATEGORIES.keys()),
         key="category_select"
     )
     
     st.markdown("### Pages Indexes")
     num_pages = st.selectbox(
-        "Nombre de pages",
+        "Number of pages",
         options=[5, 10, 15, 20, 25, 30, 50, 75, 100, 120],
         index=0,
         key="pages_select"
@@ -406,7 +367,7 @@ with st.sidebar:
     st.markdown("### Options")
     
     option_choice = st.selectbox(
-        "Choisir une option",
+        "Choose an option",
         [
             "Scrape data using BeautifulSoup",
             "Download scraped data",
@@ -418,14 +379,14 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📊 Info")
-    st.info(f"**Catégorie:** {selected_category}\n\n**Pages:** {num_pages}")
+    st.info(f"**Category:** {selected_category}\n\n**Pages:** {num_pages}")
 
 # Zone principale
-st.markdown('<h1 class="main-title">🛍️ Scraper Coinafrique Multi-Catégories</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Scrapez des données de 4 catégories : vêtements homme, chaussures homme, vêtements enfants et chaussures enfants depuis coinafrique.com</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-title">🛍️ Coinafrique Multi-Category Scraper</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Scrape data from 4 categories: men\'s clothing, men\'s shoes, children\'s clothing and children\'s shoes from coinafrique.com</p>', unsafe_allow_html=True)
 
-st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, plotly, scipy")
-st.markdown("**Data source:** [Coinafrique Sénégal](https://sn.coinafrique.com)")
+st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, scipy, matplotlib, seaborn")
+st.markdown("**Data source:** [Coinafrique Senegal](https://sn.coinafrique.com)")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -434,12 +395,12 @@ if option_choice == "Scrape data using BeautifulSoup":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         category_info = CATEGORIES[selected_category]
-        if st.button(f"{category_info['icon']} Scraper {selected_category}"):
+        if st.button(f"{category_info['icon']} Scrape {selected_category}"):
             progress_bar = st.progress(0)
             status_text = st.empty()
             
             start_time = time.time()
-            status_text.markdown(f"**⏳ Scraping de {selected_category} en cours...**")
+            status_text.markdown(f"**⏳ Scraping {selected_category} in progress...**")
             
             df = scrape_category(
                 category_info['url'], 
@@ -449,7 +410,7 @@ if option_choice == "Scrape data using BeautifulSoup":
             
             elapsed_time = time.time() - start_time
             progress_bar.progress(1.0)
-            status_text.markdown(f"**✅ Scraping terminé en {elapsed_time:.2f} secondes !**")
+            status_text.markdown(f"**✅ Scraping completed in {elapsed_time:.2f} seconds!**")
             
             if not df.empty:
                 st.session_state[f'scraped_data_{selected_category}'] = df
@@ -457,13 +418,13 @@ if option_choice == "Scrape data using BeautifulSoup":
                 st.session_state['num_pages'] = num_pages
                 st.session_state['elapsed_time'] = elapsed_time
             else:
-                st.error("❌ Aucune donnée récupérée.")
+                st.error("❌ No data retrieved.")
 
 elif option_choice == "Download scraped data":
     available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
     
     if available_data:
-        st.success(f"✅ {len(available_data)} catégorie(s) disponible(s) pour téléchargement")
+        st.success(f"✅ {len(available_data)} category(ies) available for download")
         
         for cat_name in available_data:
             df = st.session_state[f'scraped_data_{cat_name}']
@@ -472,21 +433,21 @@ elif option_choice == "Download scraped data":
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
                 st.download_button(
-                    label=f"📥 Télécharger {cat_name} ({len(df)} lignes)",
+                    label=f"📥 Download {cat_name} ({len(df)} rows)",
                     data=csv,
-                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
+                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(\"'\", '')}.csv",
                     mime="text/csv",
                     use_container_width=True,
                     key=f"download_{cat_name}"
                 )
     else:
-        st.warning("⚠️ Aucune donnée scrapée disponible. Veuillez d'abord scraper les données.")
+        st.warning("⚠️ No scraped data available. Please scrape data first.")
 
 elif option_choice == "Dashboard of the data":
     available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
     
     if available_data:
-        st.markdown("## 📊 Dashboard des données")
+        st.markdown("## 📊 Data Dashboard")
         
         for cat_name in available_data:
             df = st.session_state[f'scraped_data_{cat_name}']
@@ -494,46 +455,46 @@ elif option_choice == "Dashboard of the data":
             
             st.markdown(f"### {cat_info['icon']} {cat_name}")
             
-            # Métriques
+            # Metrics
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("Total annonces", len(df), "📦")
+                st.metric("Total Ads", len(df), "📦")
             with col2:
-                st.metric("Adresses uniques", df['adress'].nunique(), "📍")
+                st.metric("Unique Locations", df['adress'].nunique(), "📍")
             with col3:
                 try:
                     df['price_numeric'] = df['price'].apply(clean_price)
                     avg_price = df[df['price_numeric'] > 0]['price_numeric'].mean()
-                    st.metric("Prix moyen", f"{avg_price:,.0f} CFA", "💰")
+                    st.metric("Average Price", f"{avg_price:,.0f} CFA", "💰")
                 except:
-                    st.metric("Prix moyen", "N/A", "💰")
+                    st.metric("Average Price", "N/A", "💰")
             with col4:
                 try:
                     median_price = df[df['price_numeric'] > 0]['price_numeric'].median()
-                    st.metric("Prix médian", f"{median_price:,.0f} CFA", "📊")
+                    st.metric("Median Price", f"{median_price:,.0f} CFA", "📊")
                 except:
-                    st.metric("Prix médian", "N/A", "📊")
+                    st.metric("Median Price", "N/A", "📊")
             
-            # Graphiques
-            fig = create_plots_for_category(df, cat_name, cat_info['color'])
+            # Charts
+            fig = create_charts_for_category(df, cat_name, cat_info['color'])
             if fig:
-                st.plotly_chart(fig, use_container_width=True)
+                st.pyplot(fig)
             
             st.markdown("---")
     else:
-        st.warning("⚠️ Aucune donnée disponible. Veuillez d'abord scraper les données.")
+        st.warning("⚠️ No data available. Please scrape data first.")
 
 elif option_choice == "Evaluate the App":
-    st.markdown("## ⭐ Évaluation de l'application")
+    st.markdown("## ⭐ App Evaluation")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### 📝 Formulaire Google Forms")
-        st.markdown("Évaluez notre application via Google Forms :")
+        st.markdown("### 📝 Google Forms")
+        st.markdown("Evaluate our app via Google Forms:")
         st.markdown("[![Google Forms](https://img.shields.io/badge/Google%20Forms-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog)")
         
-        # Intégration iframe Google Forms
+        # Google Forms iframe
         st.components.v1.iframe(
             "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?embedded=true",
             height=800,
@@ -541,11 +502,11 @@ elif option_choice == "Evaluate the App":
         )
     
     with col2:
-        st.markdown("### 📋 Formulaire KoboToolbox")
-        st.markdown("Ou utilisez KoboToolbox :")
+        st.markdown("### 📋 KoboToolbox")
+        st.markdown("Or use KoboToolbox:")
         st.markdown("[![KoboToolbox](https://img.shields.io/badge/KoboToolbox-00A79D?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6Ii8+PC9zdmc+)](https://ee.kobotoolbox.org/x/LNbLn5W1)")
         
-        # Intégration iframe KoboToolbox
+        # KoboToolbox iframe
         st.components.v1.iframe(
             "https://ee.kobotoolbox.org/x/LNbLn5W1",
             height=800,
@@ -559,32 +520,32 @@ if 'current_category' in st.session_state and option_choice == "Scrape data usin
     num_pages = st.session_state.get('num_pages', 0)
     
     st.markdown("---")
-    st.markdown(f"## 📊 Résultats : {cat_name}")
+    st.markdown(f"## 📊 Results: {cat_name}")
     st.markdown(f"**Data dimension:** {len(df)} rows and {len(df.columns)} columns.")
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Affichage du tableau
+    # Display table
     st.dataframe(df, use_container_width=True, height=400)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Bouton téléchargement
+    # Download button
     csv = df.to_csv(index=False).encode('utf-8')
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.download_button(
             label="📥 Download data as CSV",
             data=csv,
-            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_')}_{num_pages}pages.csv",
+            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(\"'\", '')}_{num_pages}pages.csv",
             mime="text/csv",
             use_container_width=True
         )
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Galerie d'images
-    st.markdown("### 🖼️ Aperçu des articles")
+    # Image gallery
+    st.markdown("### 🖼️ Preview of Items")
     cols = st.columns(5)
     for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
         with col:
