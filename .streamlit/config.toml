@@ -1,12 +1,15 @@
-## Fichier: .streamlit/config.toml
-
 [theme]
 # Définit le thème de base pour partir d'une interface claire
 base = "light"
 
-# Couleurs personnalisées pour le thème Vert d'Eau (Teal)
-primaryColor = "#008080"       # Vert d'Eau foncé (couleur principale des boutons, liens)
-backgroundColor = "#F0FFFF"    # Fond très clair (Azure Light, correspond au fond global)
-secondaryBackgroundColor = "#E0FFFF" # Cyan très pâle (pour la barre latérale et les blocs secondaires)
-textColor = "#333333"          # Couleur de texte Gris foncé et professionnel
+# Couleurs personnalisées pour le thème Vert d'Eau / Professionnel
+primaryColor = "#008080"       # Vert d'Eau foncé (Teal Dark)
+backgroundColor = "#F0FFFF"    # Fond très clair (Azure Light, correspond à la base de l'overlay)
+secondaryBackgroundColor = "#F8FFFF" # Presque blanc avec une légère touche de cyan (pour la barre latérale)
+textColor = "#333333"          # Couleur de texte Gris foncé standard
 font = "sans serif"
+
+[server]
+# Utile si vous avez des problèmes de cache ou si vous utilisez un proxy
+# enableCORS = true
+# enableXsrfProtection = true
