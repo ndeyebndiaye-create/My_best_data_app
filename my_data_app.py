@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Configuration des variables
-# Lien direct pour le formulaire Google Forms
-GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=sf_link"
+# Liens directs pour les formulaires d'évaluation
+GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
+KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 
 # Configuration de la page
 st.set_page_config(
@@ -132,8 +133,8 @@ st.markdown("""
         background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%) !important;
     }
 
-    /* Bouton d'évaluation personnalisé */
-    #button-evaluate > button {
+    /* Bouton d'évaluation Google Forms personnalisé (Doré) */
+    #button-evaluate-google > button {
         background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%) !important;
         color: #8B4513 !important;
         font-weight: 800;
@@ -148,12 +149,36 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 1.5px;
     }
-    #button-evaluate > button:hover {
+    #button-evaluate-google > button:hover {
         transform: translateY(-5px) scale(1.02);
         box-shadow: 0 15px 35px rgba(255, 215, 0, 0.5),
                     inset 0 -2px 5px rgba(0,0,0,0.1);
         background: linear-gradient(135deg, #FFA500 0%, #FFD700 50%, #FFDF00 100%) !important;
     }
+    
+    /* Bouton d'évaluation KoboToolbox personnalisé (Bleu/Vert - couleur Kobo) */
+    #button-evaluate-kobo > button {
+        background: linear-gradient(135deg, #37D67A 0%, #00B359 50%, #00994D 100%) !important;
+        color: white !important;
+        font-weight: 800;
+        border: none;
+        border-radius: 15px;
+        padding: 18px 35px;
+        font-size: 1.15rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        width: 100%;
+        box-shadow: 0 8px 25px rgba(0, 179, 89, 0.35),
+                    inset 0 -2px 5px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    #button-evaluate-kobo > button:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0, 179, 89, 0.5),
+                    inset 0 -2px 5px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #00B359 0%, #37D67A 50%, #00CC66 100%) !important;
+    }
+
     
     /* Tableau avec effet premium */
     [data-testid="stDataFrame"] {
@@ -376,7 +401,8 @@ def create_charts_for_category(df, cat_name, cat_color):
         # Use pd.qcut and 'drop' duplicates if not enough unique data points
         try:
             quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'], duplicates='drop')
-            quartile_counts = quartile_counts.value_counts().sort_index()
+            # CORRECTION : Utiliser 'quartiles' pour obtenir les counts
+            quartile_counts = quartiles.value_counts().sort_index() 
             axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
             axes[1, 1].set_xticks(range(len(quartile_counts)))
             axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
@@ -437,7 +463,6 @@ st.markdown('<h1 class="main-title">🛍️ Coinafrique Multi-Category Scraper</
 st.markdown('<p class="subtitle">Scrape data from 4 categories: men\'s clothing, men\'s shoes, children\'s clothing and children\'s shoes from coinafrique.com</p>', unsafe_allow_html=True)
 st.markdown("**Python libraries:** base64, pandas, streamlit, requests, bs4, scipy, matplotlib, seaborn")
 
-# MODIFICATION 1 : Affichage du lien de la catégorie sélectionnée
 st.markdown(f"**Data source:** [{selected_category}]({cat_info['url']})") 
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -539,13 +564,22 @@ elif option_choice == "Evaluate the App":
     st.markdown("## ⭐ App Evaluation")
     st.markdown("Please take a moment to evaluate our application. Your feedback is valuable for its improvement.")
     
-    # MODIFICATION 2 : Bouton unique pour Google Forms
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown('<div id="button-evaluate">', unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown('<div id="button-evaluate-google">', unsafe_allow_html=True)
         st.link_button(
-            label="✨ Fill out the Evaluation Form (Google Forms)",
+            label="✨ Evaluate on Google Forms",
             url=GOOGLE_FORMS_LINK,
+            use_container_width=True
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with col2:
+        st.markdown('<div id="button-evaluate-kobo">', unsafe_allow_html=True)
+        st.link_button(
+            label="📝 Evaluate on KoboToolbox",
+            url=KOBOTOOLBOX_LINK,
             use_container_width=True
         )
         st.markdown('</div>', unsafe_allow_html=True)
