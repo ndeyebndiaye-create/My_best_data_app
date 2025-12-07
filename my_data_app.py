@@ -15,68 +15,87 @@ KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 # Page Configuration
 st.set_page_config(
     page_title="Coinafrique Scraper - Multi-Categories",
-    page_icon="📊", # Remplacé par un icône neutre
+    page_icon="📊", 
     layout="wide"
 )
 
-# Thème de couleur Vert d'Eau (Teal)
-TEAL_DARK = "#008080"      # Vert d'Eau foncé / Teal
-TEAL_LIGHT = "#00CCCC"     # Cyan / Vert d'Eau clair
-BACKGROUND_COLOR = "#F0FFFF" # Azure très clair
-CARD_COLOR = "#FFFFFF"     # Blanc pour les cartes
+# --- NOUVELLE PALETTE DE COULEURS PROFESSIONNELLE ---
+# Thème principal: Vert d'Eau / Teal (frais, confiant)
+TEAL_DARK = "#008080"       # Vert d'Eau foncé
+TEAL_LIGHT = "#00CCCC"      # Cyan / Vert d'Eau clair
 
-# Custom CSS with modern Teal/Aquamarine design (NO EMOJIS)
+# Couleur Secondaire: Gris-Bleu (professionnel, apaisant)
+SECONDARY_BLUE_GRAY = "#607D8B" 
+
+# Couleur d'Accent: Vert Citron (pour l'énergie et les actions clés)
+ACCENT_LIME = "#CDDC39" 
+
+# Couleurs de Fond
+MAIN_BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1542744173-05336fcc7ad4?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" # Image de bureau/market
+WELCOME_BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1576759795078-7d8b5c9b9804?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" # Image d'entrepôt/logistique claire
+BACKGROUND_COLOR_OVERLAY = "rgba(240, 255, 255, 0.95)" # Opacité très légère pour laisser voir l'image
+CARD_COLOR = "#FFFFFF"     
+
+# Custom CSS with modern Teal/Aquamarine design and professional accents
 st.markdown(f"""
 <style>
-    /* Global background for the app - Using a clear, professional e-commerce image */
+    /* 1. GLOBAL BACKGROUND (Scraping & Dashboard) */
     .stApp {{
-        background: linear-gradient(rgba(240, 255, 255, 0.95), rgba(240, 255, 255, 0.95)),
-                    url('https://images.unsplash.com/photo-1576759795078-7d8b5c9b9804?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Stockage/Logistique clair */
+        background: linear-gradient({BACKGROUND_COLOR_OVERLAY}, {BACKGROUND_COLOR_OVERLAY}),
+                    url('{MAIN_BACKGROUND_IMAGE}');
         background-size: cover;
         background-attachment: fixed;
         background-position: center;
         color: #333333;
     }}
 
-    /* Sidebar with solid light background */
+    /* 2. SIDEBAR */
     [data-testid="stSidebar"] {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: #F8FFFF; /* Très clair */
         box-shadow: 4px 0 15px rgba(0,0,0,0.05);
-        color: {TEAL_DARK};
+        color: {SECONDARY_BLUE_GRAY};
     }}
     
-    /* Sidebar titles/text */
+    /* Sidebar titles/text (Gris-Bleu) */
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
     [data-testid="stSidebar"] h3,
     [data-testid="stSidebar"] label {{
-        color: {TEAL_DARK} !important;
+        color: {SECONDARY_BLUE_GRAY} !important;
         font-weight: 700;
         letter-spacing: 0.5px;
     }}
     
-    /* Main area with clean card effect */
+    /* 3. MAIN AREA CARD */
     .main .block-container {{
         background-color: {CARD_COLOR};
         border-radius: 15px;
         padding: 2.5rem;
         margin-top: 2rem;
-        box-shadow: 0 8px 30px rgba(0, 128, 128, 0.1),
-                    0 0 0 1px rgba(0, 128, 128, 0.1);
+        box-shadow: 0 8px 30px rgba(0, 128, 128, 0.15);
         border: 1px solid rgba(0, 128, 128, 0.1);
     }}
     
-    /* Specific background for the Welcome Page container */
+    /* 4. WELCOME PAGE BACKGROUND (Correction pour l'image d'accueil) */
+    .stApp > header {{
+        /* IMPORTANT: Cache le header par défaut si on veut que le conteneur prenne toute la place */
+        visibility: hidden;
+        height: 0px;
+    }}
     #welcome-page-container {{
-        background: {CARD_COLOR}; 
+        /* Définition du conteneur pour l'image de fond claire */
+        background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                    url('{WELCOME_BACKGROUND_IMAGE}'); 
+        background-size: cover;
+        background-position: center;
         border-radius: 15px;
         padding: 3rem;
-        margin-top: 2rem;
+        margin-top: 0rem; /* Réajusté car le header est caché */
         box-shadow: 0 10px 40px rgba(0, 128, 128, 0.2);
         border: 1px solid rgba(0, 128, 128, 0.2);
     }}
 
-    /* Main title (Teal gradient) */
+    /* 5. TITLES (Gradient Vert d'Eau) */
     .welcome-title, .main-title {{
         font-size: 3.5rem;
         font-weight: 900;
@@ -85,20 +104,20 @@ st.markdown(f"""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 6px rgba(0, 128, 128, 0.2);
-        letter-spacing: 2px;
+        text-shadow: 1px 1px 4px rgba(0, 128, 128, 0.3);
+        letter-spacing: 1px;
     }}
 
     .subtitle {{
         text-align: center;
-        color: #555555;
+        color: {SECONDARY_BLUE_GRAY};
         font-size: 1.1rem;
         margin-bottom: 2rem;
         line-height: 1.6;
         font-weight: 400;
     }}
     
-    /* Primary Button (Scraping/Main Action) - Teal */
+    /* 6. PRIMARY BUTTON (Scraping) - Vert d'Eau Principal */
     .stButton>button {{
         background: linear-gradient(135deg, {TEAL_DARK} 0%, {TEAL_LIGHT} 100%) !important;
         color: white !important;
@@ -117,130 +136,99 @@ st.markdown(f"""
     .stButton>button:hover {{
         transform: translateY(-3px);
         box-shadow: 0 8px 20px rgba(0, 128, 128, 0.6);
-        background: linear-gradient(135deg, #00A3A3 0%, #00B3B3 100%) !important;
     }}
 
-    /* Evaluation button 1 (Accent Green) */
-    #button-evaluate-google > button {{
-        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%) !important;
-        color: white !important;
-        font-weight: 700;
-        border-radius: 8px;
-        padding: 15px 30px;
-        box-shadow: 0 4px 15px rgba(76, 175, 79, 0.4);
-    }}
-    #button-evaluate-google > button:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(76, 175, 79, 0.6);
-    }}
-    
-    /* Evaluation button 2 (Accent Blue) */
-    #button-evaluate-kobo > button {{
-        background: linear-gradient(135deg, #2196F3 0%, #4DD0E1 100%) !important;
-        color: white !important;
-        font-weight: 700;
-        border-radius: 8px;
-        padding: 15px 30px;
-        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
-    }}
-    #button-evaluate-kobo > button:hover {{
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(33, 150, 243, 0.6);
-    }}
-    
-    /* Download button (Teal Accent) */
+    /* 7. ACCENT BUTTONS (Évaluation) - Vert Citron pour le contraste */
+    #button-evaluate-google > button, 
+    #button-evaluate-kobo > button,
     .stDownloadButton > button {{
-        background: {TEAL_LIGHT} !important;
-        color: white !important;
+        background: linear-gradient(135deg, {ACCENT_LIME} 0%, #AECB29 100%) !important;
+        color: {SECONDARY_BLUE_GRAY} !important;
+        font-weight: 700;
         border-radius: 8px;
-        padding: 12px 25px;
-        font-weight: 600;
-        box-shadow: 0 3px 10px rgba(0, 204, 204, 0.4);
+        padding: 15px 30px;
+        box-shadow: 0 4px 15px rgba(205, 220, 57, 0.4);
         border: none;
         text-transform: uppercase;
     }}
     
+    #button-evaluate-google > button:hover, 
+    #button-evaluate-kobo > button:hover,
     .stDownloadButton > button:hover {{
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0, 204, 204, 0.6);
-        background: {TEAL_DARK} !important;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(205, 220, 57, 0.6);
+        color: white !important;
     }}
-
-    /* Metrics with color */
+    
+    /* 8. METRICS */
     [data-testid="stMetricValue"] {{
         color: {TEAL_DARK};
         font-weight: 800;
     }}
     
-    /* Progress bar */
+    /* 9. ALERTS/INFO */
+    .stAlert {{
+        border-radius: 8px;
+        border-left: 5px solid {SECONDARY_BLUE_GRAY}; /* Utilisation du Gris-Bleu pour les infos */
+        background-color: #F8FFFF;
+    }}
+    
+    /* 10. SÉPARATEUR */
+    hr {{
+        border: none;
+        height: 1px;
+        background-color: rgba(96, 125, 139, 0.2); /* Gris-Bleu clair */
+        margin: 1.5rem 0;
+    }}
+    
+    /* Autres éléments (images, progress bar) restent en Vert d'Eau */
     .stProgress > div > div {{
         background-color: {TEAL_LIGHT};
     }}
     
-    /* Info boxes */
-    .stAlert {{
-        border-radius: 8px;
-        border-left: 5px solid {TEAL_DARK};
-        background-color: #F8FFFF; /* Lightest tone */
-    }}
-    
-    /* Separator line */
-    hr {{
-        border: none;
-        height: 1px;
-        background-color: rgba(0, 128, 128, 0.2);
-        margin: 1.5rem 0;
-    }}
-    
-    /* Images */
-    img {{
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }}
-    
-    img:hover {{
-        transform: scale(1.02);
-        box-shadow: 0 6px 15px rgba(0, 128, 128, 0.3);
-    }}
-
 </style>
 """, unsafe_allow_html=True)
 
-# Category Configuration (EMOJI REMOVED)
+# Category Configuration (Pas de changement des catégories, pas d'emojis)
 CATEGORIES = {
     "Men's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
-        "icon": "👔", # Maintenu dans l'objet pour les fonctions Python, mais inutilisé dans le frontend
+        "icon": "👔",
         "column": "type_habits",
-        "color": "#008080" # Teal Dark
+        "color": "#008080" 
     },
     "Men's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
         "icon": "👞",
         "column": "type_shoes",
-        "color": "#009999" # Teal Medium
+        "color": "#009999" 
     },
     "Children's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
         "icon": "👶",
         "column": "type_clothes",
-        "color": "#00B3B3" # Teal Light
+        "color": "#00B3B3" 
     },
     "Children's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
         "icon": "👟",
         "column": "type_shoes",
-        "color": "#00CCCC" # Cyan
+        "color": "#00CCCC" 
     }
 }
 
-# --- Scraping and Chart Functions (No Change) ---
-# Maintained as in the original corrected code
+# --- Scraping and Chart Functions (Non inclus ici pour la concision, mais non modifiés) ---
+# ... (Vos fonctions scrape_category, clean_price, create_charts_for_category) ...
+
+# --- SIDEBAR (Non modifiée, sans emojis) ---
+# ... (Le code de la sidebar) ...
+
+# --- MAIN CONTENT AREA (Seules les balises HTML ont été mises à jour) ---
+
+# --- DÉBUT DES FONCTIONS PYTHON ---
+
 def scrape_category(url, num_pages, column_name):
-    """Scrape a specific category"""
     data = []
-    
     for i in range(num_pages):
         try:
             time.sleep(0.5) 
@@ -248,7 +236,6 @@ def scrape_category(url, num_pages, column_name):
             res = get(page_url)
             soup = bs(res.content, 'html.parser')
             containers = soup.find_all('div', class_='col s6 m4 l3')
-            
             for container in containers:
                 try:
                     item_type = container.find('p', 'ad__card-description').text.strip()
@@ -256,7 +243,6 @@ def scrape_category(url, num_pages, column_name):
                     adress = container.find('p', class_='ad__card-location').text.strip()
                     img_tag = container.find('img', class_='ad__card-img')
                     img = img_tag['src'] if img_tag and 'src' in img_tag.attrs else "No Image"
-                    
                     dic = {
                         column_name: item_type,
                         'price': price,
@@ -268,11 +254,9 @@ def scrape_category(url, num_pages, column_name):
                     pass
         except:
             pass
-    
     return pd.DataFrame(data)
 
 def clean_price(price_str):
-    """Clean and convert prices to float"""
     try:
         cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
         return float(cleaned) if cleaned.isdigit() else 0
@@ -280,21 +264,13 @@ def clean_price(price_str):
         return 0
 
 def create_charts_for_category(df, cat_name, cat_color):
-    """Create charts for a category using matplotlib"""
-    
-    # Clean prices
     df['price_numeric'] = df['price'].apply(clean_price)
     df_clean = df[df['price_numeric'] > 0]
-    
     if len(df_clean) < 10:
         return None
-    
-    # Set style
     sns.set_style("whitegrid")
-    
-    # Create figure with subplots
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=1.0) # Adjusted y-position
+    fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=1.0)
     
     # 1. KDE Plot
     prices = df_clean['price_numeric'].values
@@ -302,18 +278,15 @@ def create_charts_for_category(df, cat_name, cat_color):
         axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black', density=True)
         kde = stats.gaussian_kde(prices)
         x_range = np.linspace(prices.min(), prices.max(), 200)
-        axes[0, 0].plot(x_range, kde(x_range),
-                        color=cat_color, linewidth=3, label='KDE')
+        axes[0, 0].plot(x_range, kde(x_range), color=cat_color, linewidth=3, label='KDE')
         axes[0, 0].set_ylabel('Density', fontsize=12)
     else:
         axes[0, 0].hist(prices, bins=1, color=cat_color, edgecolor='black')
         axes[0, 0].set_ylabel('Frequency', fontsize=12)
-    
     axes[0, 0].set_title('Price Distribution (Histogram & KDE)', fontsize=14, fontweight='bold')
     axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
     axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
-
     
     # 2. Top 10 Locations
     top_locations = df['adress'].value_counts().head(10)
@@ -359,8 +332,9 @@ def create_charts_for_category(df, cat_name, cat_color):
     plt.tight_layout()
     return fig
 
+# --- DÉBUT DU FLUX STREAMLIT ---
+
 # --- SIDEBAR ---
-# Main page selection (NO EMOJI)
 st.sidebar.markdown("## Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
@@ -413,19 +387,19 @@ else:
     selected_category = list(CATEGORIES.keys())[0]
     num_pages = 5
     option_choice = "Scrape data using BeautifulSoup"
-# --- END SIDEBAR ---
+# --- FIN SIDEBAR ---
 
 # --- MAIN CONTENT AREA ---
 
 if page_selection == "1. Welcome & Guide":
     
     with st.container(border=False):
-        st.markdown('<div id="welcome-page-container">', unsafe_allow_html=True)
+        # Le conteneur qui reçoit l'image de fond (corrigée par le CSS)
+        st.markdown('<div id="welcome-page-container">', unsafe_allow_html=True) 
         
         st.markdown('<h1 class="welcome-title">Welcome to the Coinafrique Scraper</h1>', unsafe_allow_html=True)
         st.markdown('<p class="subtitle">Your dedicated tool for **online sales market analysis** on Coinafrique Senegal. Prepare your market studies with precision and clarity.</p>', unsafe_allow_html=True)
 
-        # Updated image for sales / marketplace
         st.image(
             "https://images.unsplash.com/photo-1601004928014-998875a6c8e3?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             caption="Clear view of market and sales context.",
@@ -437,8 +411,8 @@ if page_selection == "1. Welcome & Guide":
         st.markdown("## How to Use the App")
         st.markdown("""
         1.  **Change Page**: In the sidebar on the left, select **"2. Scrape & Analyze"**.
-        2.  **Select Category**: Choose the product category (men's clothing/shoes, children's clothing/shoes) you want to analyze.
-        3.  **Define Number of Pages**: Enter the number of pages to scrape. Higher numbers increase processing time (max. 120 pages).
+        2.  **Select Category**: Choose the product category you want to analyze.
+        3.  **Define Number of Pages**: Enter the number of pages to scrape.
         4.  **Start Scraping**: Click the main button to collect data.
         5.  **Analyze**: Use the **"Data Dashboard"** or **"Download scraped data"** options to visualize or export the results.
         """)
@@ -447,7 +421,7 @@ if page_selection == "1. Welcome & Guide":
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-else: # Scraping and Analysis Page
+else: 
     
     cat_info = CATEGORIES[selected_category]
     st.markdown('<h1 class="main-title">Coinafrique Multi-Category Scraper</h1>', unsafe_allow_html=True)
@@ -461,7 +435,6 @@ else: # Scraping and Analysis Page
     if option_choice == "Scrape data using BeautifulSoup":
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            # NO EMOJI
             if st.button(f"Scrape Data for {selected_category}"):
                 progress_bar = st.progress(0)
                 status_text = st.empty()
@@ -506,7 +479,6 @@ else: # Scraping and Analysis Page
             csv = df.to_csv(index=False).encode('utf-8')
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
-                # NO EMOJI
                 st.download_button(
                     label="Download data as CSV",
                     data=csv,
