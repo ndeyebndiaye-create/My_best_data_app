@@ -435,7 +435,7 @@ elif option_choice == "Download scraped data":
                 st.download_button(
                     label=f"📥 Download {cat_name} ({len(df)} rows)",
                     data=csv,
-                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(\"'\", '')}.csv",
+                    file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}.csv",
                     mime="text/csv",
                     use_container_width=True,
                     key=f"download_{cat_name}"
@@ -537,7 +537,7 @@ if 'current_category' in st.session_state and option_choice == "Scrape data usin
         st.download_button(
             label="📥 Download data as CSV",
             data=csv,
-            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(\"'\", '')}_{num_pages}pages.csv",
+            file_name=f"coinafrique_{cat_name.lower().replace(' ', '_').replace(chr(39), '')}_{num_pages}pages.csv",
             mime="text/csv",
             use_container_width=True
         )
