@@ -451,19 +451,24 @@ def create_charts_for_category(df, cat_name, cat_color):
     return fig
 
 # SIDEBAR
-st.sidebar.markdown("##  Navigation")
+st.sidebar.markdown("## 🧭 Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
-    ["🏠 Welcome", " Scrape & Analyze"],
+    ["🏠 Welcome", "📊 Scrape & Analyze"],
     index=0
 )
 
-if page_selection == "Scrape & Analyze":
+# Initialize default values
+selected_category = list(CATEGORIES.keys())[0]
+num_pages = 5
+option_choice = "Scrape data using BeautifulSoup"
+
+if page_selection == "📊 Scrape & Analyze":
     st.sidebar.markdown("---")
     st.sidebar.markdown("## ⚙️ Settings")
     
     selected_category = st.sidebar.selectbox(
-        " Category",
+        "📂 Category",
         list(CATEGORIES.keys()),
         key="category_select"
     )
@@ -494,7 +499,7 @@ if page_selection == "Scrape & Analyze":
 if page_selection == "🏠 Welcome":
     st.markdown('<div class="welcome-container animated">', unsafe_allow_html=True)
     
-    st.markdown('<h1 class="welcome-title"> Coinafrique Scraper Pro</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="welcome-title">🛍️ Coinafrique Scraper Pro</h1>', unsafe_allow_html=True)
     st.markdown('<p class="welcome-subtitle">Your Professional Tool for Fashion & Footwear Market Analysis in Senegal</p>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
@@ -502,7 +507,7 @@ if page_selection == "🏠 Welcome":
     with col1:
         st.markdown("""
         <div class="feature-card">
-            <span class="feature-icon"></span>
+            <span class="feature-icon">🎯</span>
             <h3 class="feature-title">Smart Scraping</h3>
             <p class="feature-text">Extract data from thousands of fashion listings with advanced web scraping technology.</p>
         </div>
@@ -511,7 +516,7 @@ if page_selection == "🏠 Welcome":
     with col2:
         st.markdown("""
         <div class="feature-card">
-            <span class="feature-icon"></span>
+            <span class="feature-icon">📊</span>
             <h3 class="feature-title">Deep Analytics</h3>
             <p class="feature-text">Visualize price distributions, top locations, and market trends with interactive charts.</p>
         </div>
@@ -520,7 +525,7 @@ if page_selection == "🏠 Welcome":
     with col3:
         st.markdown("""
         <div class="feature-card">
-            <span class="feature-icon"></span>
+            <span class="feature-icon">💾</span>
             <h3 class="feature-title">Easy Export</h3>
             <p class="feature-text">Download your data in CSV format for further analysis in Excel or other tools.</p>
         </div>
@@ -570,7 +575,7 @@ else:
                 if not df.empty:
                     st.session_state[f'scraped_data_{selected_category}'] = df
                     st.session_state['current_category'] = selected_category
-                    st.success(f" Successfully scraped **{len(df)} products**!")
+                    st.success(f"🎉 Successfully scraped **{len(df)} products**!")
                 else:
                     st.error("❌ No data found. Try increasing the number of pages.")
         
@@ -578,7 +583,7 @@ else:
             df = st.session_state[f'scraped_data_{selected_category}']
             
             st.markdown("---")
-            st.markdown(f"##  Results: {selected_category}")
+            st.markdown(f"## 📦 Results: {selected_category}")
             st.markdown(f"**{len(df)} rows** × **{len(df.columns)} columns**")
             
             st.dataframe(df, use_container_width=True, height=400)
@@ -587,21 +592,21 @@ else:
             with col2:
                 csv = df.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    " DOWNLOAD CSV",
+                    "📥 DOWNLOAD CSV",
                     csv,
                     f"coinafrique_{selected_category.lower().replace(' ', '_')}.csv",
                     "text/csv",
                     use_container_width=True
                 )
             
-            st.markdown("###  Product Preview")
+            st.markdown("### 🖼️ Product Preview")
             cols = st.columns(5)
             for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
                 with col:
                     img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
                     st.image(img_url, use_container_width=True)
-                    st.caption(f" {row.price} CFA")
-                    st.caption(f" {row.adress[:15]}...")
+                    st.caption(f"💰 {row.price} CFA")
+                    st.caption(f"📍 {row.adress[:15]}...")
     
     elif option_choice == "Download scraped data":
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
@@ -616,7 +621,7 @@ else:
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.download_button(
-                        f" {cat_name} ({len(df)} rows)",
+                        f"📥 {cat_name} ({len(df)} rows)",
                         csv,
                         f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
                         "text/csv",
@@ -630,7 +635,7 @@ else:
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.markdown("##  Analytics Dashboard")
+            st.markdown("## 📊 Analytics Dashboard")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
@@ -639,16 +644,16 @@ else:
                 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric(" Total Ads", len(df))
+                    st.metric("📦 Total Ads", len(df))
                 with col2:
-                    st.metric(" Locations", df['adress'].nunique())
+                    st.metric("📍 Locations", df['adress'].nunique())
                 with col3:
                     df['price_numeric'] = df['price'].apply(clean_price)
                     avg = df[df['price_numeric'] > 0]['price_numeric'].mean()
-                    st.metric(" Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
+                    st.metric("💰 Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
                 with col4:
                     med = df[df['price_numeric'] > 0]['price_numeric'].median()
-                    st.metric(" Median", f"{med:,.0f} CFA" if med > 0 else "N/A")
+                    st.metric("📊 Median", f"{med:,.0f} CFA" if med > 0 else "N/A")
                 
                 fig = create_charts_for_category(df, cat_name, CATEGORIES[cat_name]['color'])
                 if fig:
