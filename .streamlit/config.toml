@@ -1,24 +1,23 @@
 [theme]
-# base : Définit le thème de base comme clair, ce qui est cohérent avec votre CSS
+# Définit le thème de base comme clair, pour correspondre au CSS
 base = "light"
 
-# primaryColor : La couleur principale est utilisée pour les éléments Streamlit natifs qui ne sont pas stylisés par votre CSS 
-# (ex: curseurs, indicateurs de progrès, liens non stylisés). 
-primaryColor = "#1976d2"       # Bleu Ciel (une couleur clé de votre gradient)
+# Couleur principale pour les éléments natifs (curseurs, indicateurs)
+primaryColor = "#1976d2"       # Bleu Ciel Moyen
 
-# backgroundColor : Couleur de fond de l'application (le CSS la remplace, mais c'est une bonne base)
-backgroundColor = "#F5F7FA"    # Gris très clair (pour un fond light)
+# Couleur de fond principale
+backgroundColor = "#F5F7FA"    # Gris très clair
 
-# secondaryBackgroundColor : Couleur pour la barre latérale par défaut ou les conteneurs secondaires.
+# Couleur de fond secondaire (pour la sidebar par défaut)
 secondaryBackgroundColor = "#ffffff" # Blanc pur
 
-# textColor : Couleur de texte standard pour les widgets Streamlit non stylisés
-textColor = "#1a237e"          # Bleu Marine très foncé (pour un bon contraste)
+# Couleur de texte pour les widgets Streamlit non stylisés
+textColor = "#1a237e"          # Bleu Marine très foncé
 
-# font : Définit la famille de police. Streamlit utilise le "sans serif" par défaut.
+# Famille de police par défaut
 font = "sans serif"
 
 [server]
-# Utilisé pour améliorer la compatibilité et la sécurité
+# Paramètres de sécurité et de compatibilité (décommenter si nécessaire)
 # enableCORS = true
 # enableXsrfProtection = true
