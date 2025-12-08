@@ -1,68 +1,42 @@
 [theme]
-# Couleur principale (Bleu professionnel)
+# Thème professionnel bleu
 primaryColor = "#1976d2"
-
-# Couleur de fond (Gris très clair)
 backgroundColor = "#f5f7fa"
-
-# Couleur de fond secondaire (Blanc cassé)
 secondaryBackgroundColor = "#ffffff"
-
-# Couleur du texte (Gris foncé)
 textColor = "#263238"
-
-# Police de caractères
 font = "sans serif"
 
 [server]
-# Port du serveur
+# Configuration serveur
 port = 8501
-
-# Active le mode de rechargement automatique
-runOnSave = true
-
-# Taille maximale des fichiers uploadés (en MB)
+enableCORS = false
+enableXsrfProtection = true
 maxUploadSize = 200
-
-# Active les websockets
 enableWebsocketCompression = true
 
-# Timeout pour les connexions (en secondes)
-enableXsrfProtection = true
-
 [browser]
-# Collecte des statistiques d'utilisation (désactivé pour la confidentialité)
+# Configuration navigateur
 gatherUsageStats = false
-
-# Adresse du serveur
 serverAddress = "localhost"
-
-# Port du serveur pour le navigateur
 serverPort = 8501
 
 [runner]
-# Intervalle de temps entre deux exécutions automatiques (en secondes)
+# Optimisation des performances
 magicEnabled = true
-
-# Active le fast rerun
+installTracer = false
+fixMatplotlib = true
 fastReruns = true
 
-# Enforce serializable session state
-enforcedSerializableSessionState = false
-
 [client]
-# Affiche les boutons de toolbar
+# Interface utilisateur
+showErrorDetails = true
 toolbarMode = "auto"
 
-# Affiche le bouton de développement
-showErrorDetails = true
-
-# Affiche les warnings Streamlit
-showWarningOnDirectExecution = true
-
 [logger]
-# Niveau de log (debug, info, warning, error)
+# Logs
 level = "info"
+messageFormat = "%(asctime)s - %(levelname)s - %(message)s"
 
-# Active les logs dans la console
-messageFormat = "%(asctime)s %(message)s"
+[deprecation]
+# Gestion des avertissements
+showPyplotGlobalUse = false
