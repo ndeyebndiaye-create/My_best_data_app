@@ -8,13 +8,13 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Configuration variables
+# Configuration variables (Fonctionnalités non modifiées)
 GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
 KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 
-# URL de la nouvelle image de fond (Garde-Robe) - ASSUMONS L'URL DE L'IMAGE
-# J'utilise une URL générique pour l'image que vous avez fournie.
-WARDROBE_BACKGROUND_URL = "https://i.imgur.com/vHqJ95u.jpg"
+# Nouvelle URL publique pour l'image de fond (Garde-Robe)
+# J'utilise cette URL d'une image de garde-robe organisée :
+WARDROBE_BACKGROUND_URL = "https://i.imgur.com/KqWk3Y3.jpeg"
 
 # Page Configuration
 st.set_page_config(
@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS with Fashion Theme (Image Garde-Robe partout)
+# --- STYLE CSS (Visuel Mise à Jour avec URL publique) ---
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
@@ -33,9 +33,8 @@ st.markdown(f"""
         font-family: 'Poppins', sans-serif;
     }}
     
-    /* OVERLAY & BACKGROUND UNIQUE (Garde-robe) */
+    /* Le fond de l'application Streamlit principal est toujours le dégradé bleu-gris */
     .stApp {{
-        /* Le fond de l'application Streamlit principal est toujours le dégradé bleu-gris */
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }}
     
@@ -83,13 +82,6 @@ st.markdown(f"""
     [data-testid="stSidebar"] p {{
         color: #ffffff !important;
         font-weight: 600;
-    }}
-    
-    [data-testid="stSidebar"] .stRadio > label {{
-        background: rgba(255,255,255,0.1);
-        padding: 0.5rem;
-        border-radius: 8px;
-        margin: 0.5rem 0;
     }}
     
     /* TITLES */
@@ -286,7 +278,7 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# Category Configuration (Unchanged)
+# Category Configuration (Fonctionnalités non modifiées)
 CATEGORIES = {
     "Men's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
@@ -314,7 +306,7 @@ CATEGORIES = {
     }
 }
 
-# Functions (Scraping and Charting - Unchanged)
+# Functions (Scraping and Charting - Non modifiées)
 def scrape_category(url, num_pages, column_name):
     data = []
     for i in range(num_pages):
@@ -627,10 +619,10 @@ else:
             st.warning("⚠️ No data available. Please scrape first from the 'Scrape data using BeautifulSoup' action.")
     
     elif option_choice == "Data Dashboard":
+        st.markdown("## 📊 Analytics Dashboard")
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.markdown("## 📊 Analytics Dashboard")
             st.info("Charts are generated only if the dataset has at least 10 entries with valid price data.")
             
             for cat_name in available_data:
