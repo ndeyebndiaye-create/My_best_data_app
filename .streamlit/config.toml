@@ -1,36 +1,18 @@
 [server]
-# Empêche Streamlit de s'ouvrir dans le navigateur par défaut après le démarrage
-# runOnSave = false 
-
-[client]
-# Active le re-run automatique lorsque le code est modifié (par défaut: true)
-# showSidebarNavigation = true
-
-[browser]
-# Pour utiliser l'emoji de la page comme titre dans l'onglet du navigateur
-# gatherUseStats = false
+# runOnSave = true
 
 [theme]
-# Couleur primaire utilisée pour les boutons et les widgets
+# Couleur primaire (boutons, liens)
 primaryColor="#1565c0" 
 
-# Couleur de fond (arrière-plan) principale. 
-# La couleur très claire est cohérente avec le dégradé 'f5f7fa' de votre .stApp.
+# Couleur de fond principale, en harmonie avec le style du CSS
 backgroundColor="#f5f7fa" 
 
-# Couleur de fond des éléments de la sidebar et des widgets (cards, selectboxes)
-# Nous utilisons un bleu foncé pour la sidebar (cohérent avec le CSS), mais le reste doit être blanc pour le style actuel.
+# Couleur de fond des composants (cartes, selectboxes, etc.)
 secondaryBackgroundColor="#f0f2f6" 
 
-# Couleur du texte principal
+# Couleur du texte
 textColor="#303030" 
 
-# Style de police (assurez-vous que la police est disponible/importée comme vous l'avez fait avec Poppins)
+# Police utilisée
 font="sans serif"
-
-[global]
-# Utiliser une largeur maximale plus grande pour le contenu de la page pour le mode 'wide' (par défaut: 730px)
-# Cela est crucial pour que le layout 'wide' soit efficace.
-# Le 'layout="wide"' dans st.set_page_config utilise la pleine largeur disponible.
-# set_page_config(layout="wide") est utilisé, donc ceci n'est pas strictement nécessaire mais peut aider à la cohérence.
-# maxMessageSize = 200
