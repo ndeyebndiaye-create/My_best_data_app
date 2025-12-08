@@ -9,26 +9,18 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Configuration variables
-GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixLlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
+GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
 KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
-
-# Dictionnaire de configuration des catégories (CORRECTION CRITIQUE APPLIQUÉE ICI)
-CATEGORIES = {
-    "Men's Clothing": {'url': "https://www.coinafrique.com/sn/vetements-hommes", 'column': 'clothing_type', 'icon': '👕', 'color': '#1565c0'},
-    "Men's Shoes": {'url': "https://www.coinafrique.com/sn/chaussures-hommes", 'column': 'shoe_type', 'icon': '👟', 'color': '#42a5f5'},
-    "Children's Clothing": {'url': "https://www.coinafrique.com/sn/vetements-enfants", 'column': 'clothing_type', 'icon': '👶', 'color': '#1a237e'},
-    "Children's Shoes": {'url': "https://www.coinafrique.com/sn/chaussures-enfants", 'column': 'shoe_type', 'icon': '👧', 'color': '#0d47a1'}
-}
 
 # Page Configuration
 st.set_page_config(
     page_title="Coinafrique Scraper Pro",
-    page_icon="🛍️",
+    page_icon="🛍️", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS with Fashion Theme (BACKGROUND FIX APPLIED HERE)
+# Modern Professional CSS with Fashion Theme (OPACITY FIX APPLIED HERE)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
@@ -37,10 +29,10 @@ st.markdown("""
         font-family: 'Poppins', sans-serif;
     }
     
-    /* WELCOME PAGE - Shopping Background (INCHANGÉ) */
+    /* WELCOME PAGE - Shopping Background */
     .welcome-container {
         background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-                     url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
+                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -53,21 +45,18 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* ALL ACTION PAGES - NOUVEAU STYLE AVEC FOND ET OVERLAY */
+    /* ALL ACTION PAGES - Shopping Bags Background (OPACITY FIX APPLIED) */
     .scraping-page, .download-page, .dashboard-page, .evaluation-page {
-        /* Copie de la structure du Welcome Container */
-        background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-                     url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90'); /* Image Ventes/Sacs */
+        /* L'overlay de la page reste à 0.98 pour maximiser la lisibilité du texte */
+        background: linear-gradient(rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.98)),
+                    url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
-        border-radius: 20px; /* Légèrement plus petit pour l'action */
+        border-radius: 20px;
         padding: 2rem;
         margin: -1rem -2rem;
         min-height: 100vh;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        position: relative;
-        overflow: hidden;
     }
     
     .welcome-container::before {
@@ -175,10 +164,10 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     
-    /* MAIN CONTENT CARD - Rendre la carte plus transparente pour voir le fond */
+    /* MAIN CONTENT CARD - Moins transparent (0.85) pour voir l'image de fond */
     .main .block-container {
-        /* Opacité à 0.85 pour laisser l'image de fond transparaître */
-        background: rgba(255, 255, 255, 0.85);
+        /* CHANGEMENT: Opacité réduite à 0.85 */
+        background: rgba(255, 255, 255, 0.85); 
         border-radius: 20px;
         padding: 3rem;
         margin-top: 2rem;
@@ -348,6 +337,34 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Category Configuration
+CATEGORIES = {
+    "Men's Clothing": {
+        "url": "https://sn.coinafrique.com/categorie/vetements-homme",
+        "icon": "👔",
+        "column": "type_habits",
+        "color": "#1565c0"
+    },
+    "Men's Shoes": {
+        "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
+        "icon": "👞",
+        "column": "type_shoes",
+        "color": "#1976d2"
+    },
+    "Children's Clothing": {
+        "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
+        "icon": "👶",
+        "column": "type_clothes",
+        "color": "#42a5f5"
+    },
+    "Children's Shoes": {
+        "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
+        "icon": "👟",
+        "column": "type_shoes",
+        "color": "#64b5f6"
+    }
+}
+
 # Functions
 def scrape_category(url, num_pages, column_name):
     data = []
@@ -380,9 +397,7 @@ def scrape_category(url, num_pages, column_name):
 
 def clean_price(price_str):
     try:
-        # Nettoyage des espaces, virgules et points non nécessaires
         cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
-        # Si le string nettoyé est un nombre, le convertir en float, sinon retourner 0
         return float(cleaned) if cleaned.isdigit() else 0
     except:
         return 0
@@ -390,11 +405,8 @@ def clean_price(price_str):
 def create_charts_for_category(df, cat_name, cat_color):
     df['price_numeric'] = df['price'].apply(clean_price)
     df_clean = df[df['price_numeric'] > 0]
-    
-    # Sortir si les données sont insuffisantes pour une analyse significative
     if len(df_clean) < 10:
         return None
-        
     sns.set_style("whitegrid")
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=1.0)
@@ -403,19 +415,13 @@ def create_charts_for_category(df, cat_name, cat_color):
     prices = df_clean['price_numeric'].values
     if len(np.unique(prices)) > 1 and len(prices) > 1:
         axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black', density=True)
-        # Gestion d'un petit nombre de points pour le KDE
-        try:
-            kde = stats.gaussian_kde(prices)
-            x_range = np.linspace(prices.min(), prices.max(), 200)
-            axes[0, 0].plot(x_range, kde(x_range), color=cat_color, linewidth=3, label='KDE')
-            axes[0, 0].set_ylabel('Density', fontsize=12)
-        except np.linalg.LinAlgError:
-            # Si le KDE échoue (ex: trop peu de données)
-            axes[0, 0].set_ylabel('Frequency', fontsize=12)
+        kde = stats.gaussian_kde(prices)
+        x_range = np.linspace(prices.min(), prices.max(), 200)
+        axes[0, 0].plot(x_range, kde(x_range), color=cat_color, linewidth=3, label='KDE')
+        axes[0, 0].set_ylabel('Density', fontsize=12)
     else:
         axes[0, 0].hist(prices, bins=1, color=cat_color, edgecolor='black')
         axes[0, 0].set_ylabel('Frequency', fontsize=12)
-        
     axes[0, 0].set_title('Price Distribution (Histogram & KDE)', fontsize=14, fontweight='bold')
     axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
     axes[0, 0].legend()
@@ -434,7 +440,7 @@ def create_charts_for_category(df, cat_name, cat_color):
     
     # 3. Box Plot
     bp = axes[1, 0].boxplot(df_clean['price_numeric'], vert=True, patch_artist=True,
-                             showmeans=True, meanline=True, labels=['Price'])
+                            showmeans=True, meanline=True, labels=['Price'])
     for patch in bp['boxes']:
         patch.set_facecolor(cat_color)
         patch.set_alpha(0.7)
@@ -442,13 +448,11 @@ def create_charts_for_category(df, cat_name, cat_color):
     axes[1, 0].set_ylabel('Price (CFA)', fontsize=12)
     axes[1, 0].grid(True, alpha=0.3, axis='y')
     
-    # 4. Quartile Distribution (Correction pour UnboundLocalError)
+    # 4. Quartile Distribution
     if len(df_clean['price_numeric'].unique()) >= 4:
         try:
             quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'], duplicates='drop')
             quartile_counts = quartiles.value_counts().sort_index()
-            
-            # Déplacement du tracé DANS le bloc try
             axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
             axes[1, 1].set_xticks(range(len(quartile_counts)))
             axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
@@ -456,13 +460,10 @@ def create_charts_for_category(df, cat_name, cat_color):
             axes[1, 1].set_xlabel('Quartile', fontsize=12)
             axes[1, 1].set_ylabel('Count', fontsize=12)
             axes[1, 1].grid(True, alpha=0.3, axis='y')
-            
         except Exception as e:
-            # Si pd.qcut échoue ou si une erreur de traçage se produit
-            axes[1, 1].text(0.5, 0.5, f'Quartile error: {e}', ha='center', va='center', fontsize=10, color='red')
-            
+            axes[1, 1].text(0.5, 0.5, f'Quartile error: {e}', ha='center', va='center')
     else:
-        axes[1, 1].text(0.5, 0.5, 'Not enough unique data points for quartiles (Min 4 unique points needed)', ha='center', va='center', fontsize=10)
+        axes[1, 1].text(0.5, 0.5, 'Not enough unique data points for quartiles', ha='center', va='center')
     
     plt.tight_layout()
     return fig
@@ -475,7 +476,7 @@ page_selection = st.sidebar.radio(
     index=0
 )
 
-# Initialize default values (Nécessaire pour éviter les erreurs si 'Scrape & Analyze' n'est pas sélectionné au départ)
+# Initialize default values
 selected_category = list(CATEGORIES.keys())[0]
 num_pages = 5
 option_choice = "Scrape data using BeautifulSoup"
@@ -646,7 +647,6 @@ else:
                     st.caption(f"📍 {row.adress[:15]}...")
     
     elif option_choice == "Download scraped data":
-        st.markdown("## 📥 Download Scraped Data")
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
@@ -667,7 +667,7 @@ else:
                         key=f"dl_{cat_name}"
                     )
         else:
-            st.warning("⚠️ No data available. Please scrape data first.")
+            st.warning("⚠️ No data available. Please scrape first.")
     
     elif option_choice == "Data Dashboard":
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
@@ -693,16 +693,15 @@ else:
                     med = df[df['price_numeric'] > 0]['price_numeric'].median()
                     st.metric("📊 Median", f"{med:,.0f} CFA" if med > 0 else "N/A")
                 
-                # Génération des graphiques
                 fig = create_charts_for_category(df, cat_name, CATEGORIES[cat_name]['color'])
                 if fig:
                     st.pyplot(fig)
                 else:
-                    st.warning("⚠️ Need at least 10 valid data points for charts.")
+                    st.warning("⚠️ Need at least 10 items for charts")
                 
                 st.markdown("---")
         else:
-            st.warning("⚠️ No data available. Please scrape data first.")
+            st.warning("⚠️ No data available. Please scrape first.")
     
     elif option_choice == "Evaluate the App":
         st.markdown("## ⭐ Help Us Improve")
