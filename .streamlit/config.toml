@@ -2,10 +2,10 @@
 # runOnSave = true
 
 [theme]
-# Couleur primaire (boutons, liens)
+# Couleur primaire (boutons, liens) en bleu foncé
 primaryColor="#1565c0" 
 
-# Couleur de fond principale, en harmonie avec le style du CSS
+# Couleur de fond principale (arrière-plan du stApp)
 backgroundColor="#f5f7fa" 
 
 # Couleur de fond des composants (cartes, selectboxes, etc.)
