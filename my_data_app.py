@@ -12,7 +12,8 @@ import seaborn as sns
 GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
 KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 
-# URL de la nouvelle image de fond (Garde-Robe)
+# URL de la nouvelle image de fond (Garde-Robe) - ASSUMONS L'URL DE L'IMAGE
+# J'utilise une URL générique pour l'image que vous avez fournie.
 WARDROBE_BACKGROUND_URL = "https://i.imgur.com/vHqJ95u.jpg"
 
 # Page Configuration
@@ -23,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS with Fashion Theme
+# Modern Professional CSS with Fashion Theme (Image Garde-Robe partout)
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
@@ -32,8 +33,15 @@ st.markdown(f"""
         font-family: 'Poppins', sans-serif;
     }}
     
+    /* OVERLAY & BACKGROUND UNIQUE (Garde-robe) */
+    .stApp {{
+        /* Le fond de l'application Streamlit principal est toujours le dégradé bleu-gris */
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }}
+    
     /* WELCOME PAGE - Utilise l'image Garde-robe (Opacité 0.92) */
     .welcome-container {{
+        /* Overlay blanc très transparent pour laisser passer la garde-robe */
         background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
                      url('{WARDROBE_BACKGROUND_URL}');
         background-size: cover;
@@ -50,7 +58,7 @@ st.markdown(f"""
     
     /* ALL ACTION PAGES - Utilise l'image Garde-robe (Opacité 0.90) */
     .scraping-page, .download-page, .dashboard-page, .evaluation-page {{
-        /* L'overlay est réduit à 0.90 pour mieux voir l'image de fond */
+        /* Overlay légèrement plus transparent (0.90) pour mieux voir l'image de fond */
         background: linear-gradient(rgba(255, 255, 255, 0.90), rgba(250, 250, 250, 0.90)),
                      url('{WARDROBE_BACKGROUND_URL}');
         background-size: cover;
@@ -60,90 +68,6 @@ st.markdown(f"""
         padding: 2rem;
         margin: -1rem -2rem;
         min-height: 100vh;
-    }}
-    
-    /* Les autres styles CSS restent inchangés... */
-    .welcome-container::before {{
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(21, 101, 192, 0.05) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }}
-    
-    @keyframes rotate {{
-        0% {{ transform: rotate(0deg); }}
-        100% {{ transform: rotate(360deg); }}
-    }}
-    
-    .welcome-title {{
-        font-size: 4.5rem;
-        font-weight: 900;
-        text-align: center;
-        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 10px rgba(21, 101, 192, 0.2);
-        letter-spacing: 3px;
-        position: relative;
-        z-index: 1;
-    }}
-    
-    .welcome-subtitle {{
-        text-align: center;
-        color: #546e7a;
-        font-size: 1.4rem;
-        margin-bottom: 3rem;
-        font-weight: 400;
-        line-height: 1.8;
-        position: relative;
-        z-index: 1;
-    }}
-    
-    .feature-card {{
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(21, 101, 192, 0.1);
-        position: relative;
-        z-index: 1;
-    }}
-    
-    .feature-card:hover {{
-        transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(21, 101, 192, 0.15);
-    }}
-    
-    .feature-icon {{
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        display: block;
-    }}
-    
-    .feature-title {{
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1565c0;
-        margin-bottom: 0.5rem;
-    }}
-    
-    .feature-text {{
-        color: #546e7a;
-        font-size: 1rem;
-        line-height: 1.6;
-    }}
-    
-    /* MAIN APP BACKGROUND */
-    .stApp {{
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }}
     
     /* SIDEBAR - Elegant Navy Blue */
@@ -169,6 +93,20 @@ st.markdown(f"""
     }}
     
     /* TITLES */
+    .welcome-title {{
+        font-size: 4.5rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(21, 101, 192, 0.2);
+        letter-spacing: 3px;
+        position: relative;
+        z-index: 1;
+    }}
+
     .main-title {{
         font-size: 3.5rem;
         font-weight: 900;
@@ -180,13 +118,34 @@ st.markdown(f"""
         letter-spacing: 2px;
     }}
     
-    .subtitle {{
+    .welcome-subtitle, .subtitle {{
         text-align: center;
         color: #546e7a;
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
+        font-size: 1.4rem;
+        margin-bottom: 3rem;
         font-weight: 400;
-        line-height: 1.7;
+        line-height: 1.8;
+        position: relative;
+        z-index: 1;
+    }}
+    
+    /* CARDS */
+    .feature-card {{
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(21, 101, 192, 0.1);
+        position: relative;
+        z-index: 1;
+    }}
+    
+    .feature-card:hover {{
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(21, 101, 192, 0.15);
     }}
     
     /* BUTTONS - Primary (Scrape) */
@@ -251,27 +210,25 @@ st.markdown(f"""
         font-weight: 600;
     }}
     
-    /* ALERTS */
+    /* ALERTS & PROGRESS BARS */
     .stAlert {{
         border-radius: 12px;
         border-left: 5px solid #1976d2;
         background: rgba(25, 118, 210, 0.05);
     }}
     
-    /* PROGRESS BAR */
     .stProgress > div > div {{
         background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%);
         border-radius: 10px;
     }}
     
-    /* DATAFRAME */
+    /* IMAGES & DATAFRAME */
     [data-testid="stDataFrame"] {{
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }}
     
-    /* IMAGES */
     img {{
         border-radius: 15px;
         transition: all 0.3s ease;
@@ -311,7 +268,7 @@ st.markdown(f"""
         box-shadow: 0 10px 30px rgba(0, 137, 123, 0.6);
     }}
     
-    /* ANIMATIONS */
+    /* ANIMATIONS (Unchanged) */
     @keyframes fadeInUp {{
         from {{
             opacity: 0;
@@ -329,7 +286,7 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# Category Configuration (Reste inchangé)
+# Category Configuration (Unchanged)
 CATEGORIES = {
     "Men's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
@@ -357,7 +314,7 @@ CATEGORIES = {
     }
 }
 
-# Functions (Restent inchangées)
+# Functions (Scraping and Charting - Unchanged)
 def scrape_category(url, num_pages, column_name):
     data = []
     for i in range(num_pages):
@@ -460,7 +417,7 @@ def create_charts_for_category(df, cat_name, cat_color):
     plt.tight_layout()
     return fig
 
-# SIDEBAR (Reste inchangé)
+# SIDEBAR
 st.sidebar.markdown("## 🧭 Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
