@@ -1,19 +1,47 @@
-[server]
-# runOnSave = true
-# Si mis à true, redémarre l'application à chaque sauvegarde du fichier Python.
-
 [theme]
-# Couleur primaire utilisée pour les éléments interactifs comme les boutons et les liens.
-primaryColor="#1565c0" 
+# Thème professionnel bleu (correspondant au design)
+primaryColor = "#1976d2"
+backgroundColor = "#f5f7fa"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#263238"
+font = "sans serif"
 
-# Couleur de fond principale de l'application (l'arrière-plan du stApp, derrière les conteneurs).
-backgroundColor="#f5f7fa" 
+[server]
+# Configuration serveur optimisée
+port = 8501
+headless = true
+runOnSave = true
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 200
+enableWebsocketCompression = true
 
-# Couleur de fond secondaire utilisée pour les boîtes (selectboxes, tables) et la barre latérale.
-secondaryBackgroundColor="#f0f2f6" 
+[browser]
+# Configuration navigateur
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
 
-# Couleur du texte par défaut.
-textColor="#303030" 
+[runner]
+# Optimisation des performances
+magicEnabled = true
+installTracer = false
+fixMatplotlib = true
+fastReruns = true
+postScriptGC = true
 
-# Police utilisée.
-font="sans serif"
+[client]
+# Interface utilisateur
+showErrorDetails = true
+toolbarMode = "auto"
+showSidebarNavigation = true
+
+[logger]
+# Configuration des logs
+level = "info"
+messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+[deprecation]
+# Gestion des avertissements
+showPyplotGlobalUse = false
+showfileUploaderEncoding = false
