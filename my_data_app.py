@@ -7,11 +7,26 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sqlite3
+from pathlib import Path
+import os
 
 # Configuration variables
 GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
 KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 WARDROBE_BACKGROUND_URL = "https://www.journaldutextile.com/wp-content/uploads/2024/03/garde-robe-masculine.jpg"
+
+# Database Configuration
+DB_PATH = "coinafrique_data.db"
+CSV_FOLDER = "data"
+
+# CSV Files Configuration
+CSV_FILES = {
+    "👔 Vêtements Homme": "vetement_homme.csv",
+    "👶 Vêtements Enfant": "vetements_enfant.csv",
+    "👞 Chaussures Homme": "chaussures_hommes.csv",
+    "👟 Chaussures Enfant": "chaussure_enfant.csv"
+}
 
 # Page Configuration
 st.set_page_config(
@@ -259,29 +274,105 @@ CATEGORIES = {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
         "icon": "👔",
         "column": "type_habits",
-        "color": "#1565c0"
+        "color": "#1565c0",
+        "table": "mens_clothing"
     },
     "Men's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-homme",
         "icon": "👞",
         "column": "type_shoes",
-        "color": "#1976d2"
+        "color": "#1976d2",
+        "table": "mens_shoes"
     },
     "Children's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-enfants",
         "icon": "👶",
         "column": "type_clothes",
-        "color": "#42a5f5"
+        "color": "#42a5f5",
+        "table": "children_clothing"
     },
     "Children's Shoes": {
         "url": "https://sn.coinafrique.com/categorie/chaussures-enfants",
         "icon": "👟",
         "column": "type_shoes",
-        "color": "#64b5f6"
+        "color": "#64b5f6",
+        "table": "children_shoes"
     }
 }
 
-# Functions
+# ========================== DATABASE FUNCTIONS ==========================
+
+def init_database():
+    """Initialize SQLite database and create tables"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # Create tables for each category
+    for cat_name, cat_info in CATEGORIES.items():
+        table_name = cat_info['table']
+        cursor.execute(f'''
+            CREATE TABLE IF NOT EXISTS {table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                {cat_info['column']} TEXT,
+                price TEXT,
+                adress TEXT,
+                img TEXT,
+                scrape_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+    
+    conn.commit()
+    conn.close()
+
+def save_to_database(df, table_name, column_name):
+    """Save DataFrame to SQLite database"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        
+        # Add scrape_date column if not exists
+        if 'scrape_date' not in df.columns:
+            df['scrape_date'] = pd.Timestamp.now()
+        
+        # Append to table
+        df.to_sql(table_name, conn, if_exists='append', index=False)
+        
+        conn.close()
+        return True
+    except Exception as e:
+        st.error(f"❌ Database error: {str(e)}")
+        return False
+
+def get_from_database(table_name):
+    """Retrieve data from SQLite database"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+        conn.close()
+        return df
+    except Exception as e:
+        st.error(f"❌ Database error: {str(e)}")
+        return pd.DataFrame()
+
+def get_database_stats():
+    """Get statistics from database"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        stats = {}
+        
+        for cat_name, cat_info in CATEGORIES.items():
+            table_name = cat_info['table']
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            count = cursor.fetchone()[0]
+            stats[cat_name] = count
+        
+        conn.close()
+        return stats
+    except:
+        return {}
+
+# ========================== SCRAPING FUNCTIONS ==========================
+
 def scrape_category(url, num_pages, column_name):
     data = []
     for i in range(num_pages):
@@ -378,11 +469,30 @@ def create_charts_for_category(df, cat_name, cat_color):
     plt.tight_layout()
     return fig
 
-# SIDEBAR
+# ========================== CSV VIEWER FUNCTIONS ==========================
+
+def load_csv_file(filename):
+    """Load CSV file from data folder"""
+    try:
+        filepath = os.path.join(CSV_FOLDER, filename)
+        if os.path.exists(filepath):
+            df = pd.read_csv(filepath)
+            return df
+        else:
+            st.error(f"❌ File not found: {filepath}")
+            return None
+    except Exception as e:
+        st.error(f"❌ Error loading file: {str(e)}")
+        return None
+
+# ========================== INITIALIZE DATABASE ==========================
+init_database()
+
+# ========================== SIDEBAR ==========================
 st.sidebar.markdown("## 🧭 Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
-    ["🏠 Welcome", "📊 Scrape & Analyze"],
+    ["🏠 Welcome", "📊 Scrape & Analyze", "📁 View CSV Files", "💾 Database Manager"],
     index=0
 )
 
@@ -422,7 +532,16 @@ if page_selection == "📊 Scrape & Analyze":
     st.sidebar.markdown("---")
     st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {int(num_pages)}")
 
-# MAIN CONTENT
+# Database stats in sidebar
+if page_selection == "💾 Database Manager":
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("## 📊 Database Stats")
+    db_stats = get_database_stats()
+    for cat, count in db_stats.items():
+        st.sidebar.metric(CATEGORIES[cat]['icon'] + " " + cat, f"{count} records")
+
+# ========================== MAIN CONTENT ==========================
+
 if page_selection == "🏠 Welcome":
     st.markdown('<h1 class="welcome-title">🛍️ Coinafrique Scraper Pro</h1>', unsafe_allow_html=True)
     st.markdown('<p class="welcome-subtitle">Your Professional Tool for Fashion & Footwear Market Analysis in Senegal</p>', unsafe_allow_html=True)
@@ -458,6 +577,28 @@ if page_selection == "🏠 Welcome":
     
     st.markdown("<br>", unsafe_allow_html=True)
     
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div class="feature-card" style="text-align: center;">
+            <span class="feature-icon">📁</span>
+            <h3 class="feature-title">CSV Viewer</h3>
+            <p class="feature-text">View and download pre-collected CSV data files</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="feature-card" style="text-align: center;">
+            <span class="feature-icon">💾</span>
+            <h3 class="feature-title">Database Manager</h3>
+            <p class="feature-text">Store and manage scraped data in SQLite database</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown("""
@@ -471,7 +612,145 @@ if page_selection == "🏠 Welcome":
             st.session_state['page'] = "📊 Scrape & Analyze"
             st.rerun()
 
-else:
+elif page_selection == "📁 View CSV Files":
+    st.markdown('<h1 class="main-title">📁 CSV Files Viewer</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitle">View and download pre-collected data from CSV files</p>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # File selector
+    selected_file = st.selectbox(
+        "🗂️ Select a CSV file to view:",
+        list(CSV_FILES.keys()),
+        key="csv_selector"
+    )
+    
+    filename = CSV_FILES[selected_file]
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button(f"📂 LOAD {selected_file}", use_container_width=True):
+            with st.spinner("Loading CSV file..."):
+                df = load_csv_file(filename)
+                
+                if df is not None:
+                    st.session_state[f'csv_data_{selected_file}'] = df
+                    st.success(f"✅ Successfully loaded **{len(df)} rows** from {filename}")
+    
+    # Display loaded data
+    if f'csv_data_{selected_file}' in st.session_state:
+        df = st.session_state[f'csv_data_{selected_file}']
+        
+        st.markdown("---")
+        st.markdown(f"## 📊 Data: {selected_file}")
+        
+        # Metrics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("📦 Total Rows", len(df))
+        with col2:
+            st.metric("📋 Columns", len(df.columns))
+        with col3:
+            if 'price' in df.columns:
+                df['price_numeric'] = df['price'].apply(clean_price)
+                avg = df[df['price_numeric'] > 0]['price_numeric'].mean()
+                st.metric("💰 Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
+            else:
+                st.metric("💰 Avg Price", "N/A")
+        with col4:
+            if 'adress' in df.columns:
+                st.metric("📍 Locations", df['adress'].nunique())
+            else:
+                st.metric("📍 Locations", "N/A")
+        
+        st.markdown("### 📋 Data Preview")
+        st.dataframe(df, use_container_width=True, height=400)
+        
+        # Download button
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                f"📥 DOWNLOAD {selected_file}",
+                csv,
+                filename,
+                "text/csv",
+                use_container_width=True,
+                key=f"download_{selected_file}"
+            )
+        
+        # Product preview with images (if img column exists)
+        if 'img' in df.columns:
+            st.markdown("### 🖼️ Product Preview")
+            cols = st.columns(5)
+            for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
+                with col:
+                    img_url = row.img if hasattr(row, 'img') and row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
+                    st.image(img_url, use_container_width=True)
+                    if hasattr(row, 'price'):
+                        st.caption(f"💰 {row.price} CFA")
+                    if hasattr(row, 'adress'):
+                        st.caption(f"📍 {row.adress[:15]}...")
+
+elif page_selection == "💾 Database Manager":
+    st.markdown('<h1 class="main-title">💾 Database Manager</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitle">Manage scraped data stored in SQLite database</p>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Database overview
+    st.markdown("## 📊 Database Overview")
+    db_stats = get_database_stats()
+    
+    cols = st.columns(4)
+    for idx, (cat_name, count) in enumerate(db_stats.items()):
+        with cols[idx % 4]:
+            st.metric(
+                CATEGORIES[cat_name]['icon'] + " " + cat_name,
+                f"{count:,} records"
+            )
+    
+    st.markdown("---")
+    
+    # View data from database
+    st.markdown("## 🔍 View Database Records")
+    
+    selected_db_cat = st.selectbox(
+        "Select category to view:",
+        list(CATEGORIES.keys()),
+        key="db_category_select"
+    )
+    
+    if st.button(f"📊 VIEW {selected_db_cat} DATA", use_container_width=True):
+        table_name = CATEGORIES[selected_db_cat]['table']
+        df_db = get_from_database(table_name)
+        
+        if not df_db.empty:
+            st.session_state[f'db_data_{selected_db_cat}'] = df_db
+            st.success(f"✅ Loaded {len(df_db)} records from database")
+        else:
+            st.warning("⚠️ No data found in database for this category")
+    
+    # Display database data
+    if f'db_data_{selected_db_cat}' in st.session_state:
+        df_db = st.session_state[f'db_data_{selected_db_cat}']
+        
+        st.markdown(f"### 📋 Records: {selected_db_cat}")
+        st.dataframe(df_db, use_container_width=True, height=400)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            csv = df_db.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                "📥 DOWNLOAD FROM DATABASE",
+                csv,
+                f"database_{selected_db_cat.lower().replace(' ', '_')}.csv",
+                "text/csv",
+                use_container_width=True,
+                key=f"download_db_{selected_db_cat}"
+            )
+
+elif page_selection == "📊 Scrape & Analyze":
     cat_info = CATEGORIES[selected_category]
     
     st.markdown('<h1 class="main-title">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
@@ -485,117 +764,3 @@ else:
         with col2:
             if st.button(f"{cat_info['icon']} SCRAPE {selected_category.upper()}", use_container_width=True):
                 progress_bar = st.progress(0)
-                status_text = st.empty()
-                
-                start_time = time.time()
-                status_text.markdown(f"**⏳ Scraping {selected_category}...**")
-                
-                df = scrape_category(cat_info['url'], int(num_pages), cat_info['column'])
-                
-                elapsed_time = time.time() - start_time
-                progress_bar.progress(1.0)
-                status_text.markdown(f"**✅ Completed in {elapsed_time:.2f}s | {len(df)} items found**")
-                
-                if not df.empty:
-                    st.session_state[f'scraped_data_{selected_category}'] = df
-                    st.session_state['current_category'] = selected_category
-                    st.success(f"🎉 Successfully scraped **{len(df)} products**!")
-                else:
-                    st.error("❌ No data found. Try increasing pages.")
-        
-        if 'current_category' in st.session_state and st.session_state['current_category'] == selected_category:
-            df = st.session_state[f'scraped_data_{selected_category}']
-            
-            st.markdown("---")
-            st.markdown(f"## 📦 Results: {selected_category}")
-            st.markdown(f"**{len(df)} rows** × **{len(df.columns)} columns**")
-            
-            st.dataframe(df, use_container_width=True, height=400)
-            
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                csv = df.to_csv(index=False).encode('utf-8')
-                st.download_button(
-                    "📥 DOWNLOAD CSV",
-                    csv,
-                    f"coinafrique_{selected_category.lower().replace(' ', '_')}.csv",
-                    "text/csv",
-                    use_container_width=True
-                )
-            
-            st.markdown("### 🖼️ Product Preview")
-            cols = st.columns(5)
-            for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
-                with col:
-                    img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
-                    st.image(img_url, use_container_width=True)
-                    st.caption(f"💰 {row.price} CFA")
-                    st.caption(f"📍 {row.adress[:15]}...")
-    
-    elif option_choice == "Download scraped data":
-        available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
-        
-        if available_data:
-            st.success(f"✅ {len(available_data)} dataset(s) available")
-            
-            for cat_name in available_data:
-                df = st.session_state[f'scraped_data_{cat_name}']
-                csv = df.to_csv(index=False).encode('utf-8')
-                
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.download_button(
-                        f"📥 {cat_name} ({len(df)} rows)",
-                        csv,
-                        f"coinafrique_{cat_name.lower().replace(' ', '_')}.csv",
-                        "text/csv",
-                        use_container_width=True,
-                        key=f"dl_{cat_name}"
-                    )
-        else:
-            st.warning("⚠️ No data available. Please scrape first.")
-    
-    elif option_choice == "Data Dashboard":
-        available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
-        
-        if available_data:
-            st.markdown("## 📊 Analytics Dashboard")
-            
-            for cat_name in available_data:
-                df = st.session_state[f'scraped_data_{cat_name}']
-                
-                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name}")
-                
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("📦 Total Ads", len(df))
-                with col2:
-                    st.metric("📍 Locations", df['adress'].nunique())
-                with col3:
-                    df['price_numeric'] = df['price'].apply(clean_price)
-                    avg = df[df['price_numeric'] > 0]['price_numeric'].mean()
-                    st.metric("💰 Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
-                with col4:
-                    med = df[df['price_numeric'] > 0]['price_numeric'].median()
-                    st.metric("📊 Median", f"{med:,.0f} CFA" if med > 0 else "N/A")
-                
-                fig = create_charts_for_category(df, cat_name, CATEGORIES[cat_name]['color'])
-                if fig:
-                    st.pyplot(fig)
-                else:
-                    st.warning("⚠️ Need at least 10 items for charts")
-                
-                st.markdown("---")
-        else:
-            st.warning("⚠️ No data available. Please scrape first.")
-    
-    elif option_choice == "Evaluate the App":
-        st.markdown("## ⭐ Help Us Improve")
-        st.markdown("Your feedback matters! Choose your preferred platform:")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.link_button("📝 Google Forms", GOOGLE_FORMS_LINK, use_container_width=True)
-        with col2:
-            st.link_button("📋 KoboToolbox", KOBOTOOLBOX_LINK, use_container_width=True)
-
