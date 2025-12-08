@@ -1,22 +1,35 @@
-[server]
-# Utile pour le développement local. Si vous modifiez votre fichier Python, l'application redémarre automatiquement.
-# runOnSave = true
-
 [theme]
-# Couleur primaire (boutons, liens, progrès) basée sur le bleu foncé (#1565c0) de votre CSS.
-primaryColor="#1565c0" 
+# Thème personnalisé bleu professionnel pour Coinafrique Scraper Pro
+primaryColor = "#1976d2"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f5f7fa"
+textColor = "#1a1a1a"
+font = "sans serif"
 
-# Couleur de fond principale du thème. Votre CSS remplace le background-color du .stApp, 
-# mais il est bon de la garder propre.
-backgroundColor="#FFFFFF" 
+[server]
+# Configuration du serveur
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 200
 
-# Couleur de fond secondaire. Utilisée pour le fond des widgets (selectboxes) et 
-# la barre latérale par défaut (bien que votre CSS la stylise davantage).
-secondaryBackgroundColor="#f0f2f6" 
+[browser]
+# Configuration du navigateur
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
 
-# Couleur du texte par défaut (basée sur le gris foncé #303030 ou #546e7a de votre CSS).
-textColor="#303030" 
+[runner]
+# Configuration de l'exécution
+magicEnabled = true
+fastReruns = true
 
-# La police "sans serif" est la police par défaut de Streamlit. 
-# Votre CSS importe "Poppins" qui prendra le dessus.
-font="sans serif"
+[client]
+# Configuration client
+showErrorDetails = true
+toolbarMode = "auto"
+
+[deprecation]
+# Gestion des avertissements de dépréciation
+showfileUploaderEncoding = false
+showPyplotGlobalUse = false
