@@ -29,9 +29,9 @@ st.markdown("""
         font-family: 'Poppins', sans-serif;
     }
     
-    /* WELCOME PAGE - Fashion Background */
+    /* WELCOME PAGE - Shopping Background */
     .welcome-container {
-        background: linear-gradient(135deg, rgba(26, 35, 126, 0.88), rgba(13, 71, 161, 0.85)),
+        background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
                     url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
         background-size: cover;
         background-position: center;
@@ -40,54 +40,15 @@ st.markdown("""
         padding: 4rem 2rem;
         margin: -1rem -2rem;
         min-height: 85vh;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         position: relative;
         overflow: hidden;
     }
     
-    /* SCRAPING PAGE - Market Analysis Background */
-    .scraping-page {
-        background: linear-gradient(135deg, rgba(13, 71, 161, 0.92), rgba(21, 101, 192, 0.90)),
-                    url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1920&q=90');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        border-radius: 20px;
-        padding: 2rem;
-        margin: -1rem -2rem;
-        min-height: 100vh;
-    }
-    
-    /* DOWNLOAD PAGE - Data Export Background */
-    .download-page {
-        background: linear-gradient(135deg, rgba(255, 152, 0, 0.92), rgba(251, 192, 45, 0.90)),
-                    url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&q=90');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        border-radius: 20px;
-        padding: 2rem;
-        margin: -1rem -2rem;
-        min-height: 100vh;
-    }
-    
-    /* DASHBOARD PAGE - Analytics Background */
-    .dashboard-page {
-        background: linear-gradient(135deg, rgba(0, 137, 123, 0.92), rgba(38, 166, 154, 0.90)),
-                    url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=90');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        border-radius: 20px;
-        padding: 2rem;
-        margin: -1rem -2rem;
-        min-height: 100vh;
-    }
-    
-    /* EVALUATION PAGE - Feedback Background */
-    .evaluation-page {
-        background: linear-gradient(135deg, rgba(156, 39, 176, 0.92), rgba(171, 71, 188, 0.90)),
-                    url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1920&q=90');
+    /* ALL ACTION PAGES - Shopping Bags Background */
+    .scraping-page, .download-page, .dashboard-page, .evaluation-page {
+        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(250, 250, 250, 0.95)),
+                    url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -104,7 +65,7 @@ st.markdown("""
         right: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(21, 101, 192, 0.05) 0%, transparent 70%);
         animation: rotate 20s linear infinite;
     }
     
@@ -117,11 +78,11 @@ st.markdown("""
         font-size: 4.5rem;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 1rem;
-        text-shadow: 0 0 40px rgba(255,255,255,0.5);
+        text-shadow: 0 2px 10px rgba(21, 101, 192, 0.2);
         letter-spacing: 3px;
         position: relative;
         z-index: 1;
@@ -129,31 +90,31 @@ st.markdown("""
     
     .welcome-subtitle {
         text-align: center;
-        color: #e3f2fd;
+        color: #546e7a;
         font-size: 1.4rem;
         margin-bottom: 3rem;
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1.8;
         position: relative;
         z-index: 1;
     }
     
     .feature-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 2rem;
         margin: 1rem 0;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 1px solid rgba(21, 101, 192, 0.1);
         position: relative;
         z-index: 1;
     }
     
     .feature-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 60px rgba(25, 118, 210, 0.4);
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(21, 101, 192, 0.15);
     }
     
     .feature-icon {
