@@ -28,7 +28,7 @@ Path(CSV_FOLDER).mkdir(exist_ok=True)
 CSV_FILES = {
     "👔 Vêtements Homme": "vetement_hommes.csv",
     "👶 Vêtements Enfant": "vetement_enfants.csv",
-    "👞 Chaussures Homme": "chaussure_hommes.csv",
+    "👞 Chaussures Homme": "chaussure_homme.csv",
     "👟 Chaussures Enfant": "chaussure_enfant.csv"
 }
 
@@ -988,4 +988,5 @@ elif page_selection == "📊 Scrape & Analyze":
             
         st.markdown("<br>", unsafe_allow_html=True)
         st.info("The links above open external forms to submit your evaluation.")
+
 
