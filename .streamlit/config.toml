@@ -1,26 +1,23 @@
 [theme]
-# Définit le thème de base comme clair, pour garantir que les couleurs de la sidebar et du texte sont visibles.
+# Définit le thème de base comme clair, pour correspondre au CSS
 base = "light"
 
-# Couleur principale pour les éléments interactifs (boutons primaires, curseurs, indicateurs de progression)
-# Le bleu foncé (#1976d2) est choisi pour correspondre à votre style.
-primaryColor = "#1976d2"
+# Couleur principale pour les éléments natifs (curseurs, indicateurs)
+primaryColor = "#1976d2"       # Bleu Ciel Moyen
 
-# Couleur de fond principale de l'application. 
-# Cette couleur est remplacée par le gradient que vous avez défini dans .stApp, mais est conservée ici par bonne pratique.
-backgroundColor = "#F5F7FA"
+# Couleur de fond principale
+backgroundColor = "#F5F7FA"    # Gris très clair
 
-# Couleur de fond secondaire. Utilisée par défaut pour la barre latérale (sidebar).
-# Cette couleur est remplacée par le gradient de bleu foncé que vous avez défini dans le CSS de la sidebar.
-secondaryBackgroundColor = "#ffffff"
+# Couleur de fond secondaire (pour la sidebar par défaut)
+secondaryBackgroundColor = "#ffffff" # Blanc pur
 
-# Couleur de texte pour les widgets Streamlit natifs.
-textColor = "#1a237e"
+# Couleur de texte pour les widgets Streamlit non stylisés
+textColor = "#1a237e"          # Bleu Marine très foncé
 
-# Famille de police par défaut.
+# Famille de police par défaut
 font = "sans serif"
 
 [server]
-# Ces paramètres sont facultatifs, mais peuvent être utiles si vous rencontrez des problèmes CORS ou de sécurité.
+# Paramètres de sécurité et de compatibilité (décommenter si nécessaire)
 # enableCORS = true
 # enableXsrfProtection = true
