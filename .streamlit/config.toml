@@ -1,47 +1,22 @@
-[theme]
-# Thème professionnel bleu (correspondant au design)
-primaryColor = "#1976d2"
-backgroundColor = "#f5f7fa"
-secondaryBackgroundColor = "#ffffff"
-textColor = "#263238"
-font = "sans serif"
-
 [server]
-# Configuration serveur optimisée
-port = 8501
-headless = true
-runOnSave = true
-enableCORS = false
-enableXsrfProtection = true
-maxUploadSize = 200
-enableWebsocketCompression = true
+# Utile pour le développement local. Si vous modifiez votre fichier Python, l'application redémarre automatiquement.
+# runOnSave = true
 
-[browser]
-# Configuration navigateur
-gatherUsageStats = false
-serverAddress = "localhost"
-serverPort = 8501
+[theme]
+# Couleur primaire (boutons, liens, progrès) basée sur le bleu foncé (#1565c0) de votre CSS.
+primaryColor="#1565c0" 
 
-[runner]
-# Optimisation des performances
-magicEnabled = true
-installTracer = false
-fixMatplotlib = true
-fastReruns = true
-postScriptGC = true
+# Couleur de fond principale du thème. Votre CSS remplace le background-color du .stApp, 
+# mais il est bon de la garder propre.
+backgroundColor="#FFFFFF" 
 
-[client]
-# Interface utilisateur
-showErrorDetails = true
-toolbarMode = "auto"
-showSidebarNavigation = true
+# Couleur de fond secondaire. Utilisée pour le fond des widgets (selectboxes) et 
+# la barre latérale par défaut (bien que votre CSS la stylise davantage).
+secondaryBackgroundColor="#f0f2f6" 
 
-[logger]
-# Configuration des logs
-level = "info"
-messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+# Couleur du texte par défaut (basée sur le gris foncé #303030 ou #546e7a de votre CSS).
+textColor="#303030" 
 
-[deprecation]
-# Gestion des avertissements
-showPyplotGlobalUse = false
-showfileUploaderEncoding = false
+# La police "sans serif" est la police par défaut de Streamlit. 
+# Votre CSS importe "Poppins" qui prendra le dessus.
+font="sans serif"
