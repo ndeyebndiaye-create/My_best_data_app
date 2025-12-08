@@ -10,6 +10,7 @@ import seaborn as sns
 import sqlite3
 from pathlib import Path
 import os
+import io
 
 # Configuration variables
 GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
@@ -20,7 +21,10 @@ WARDROBE_BACKGROUND_URL = "https://www.journaldutextile.com/wp-content/uploads/2
 DB_PATH = "coinafrique_data.db"
 CSV_FOLDER = "data"
 
-# CSV Files Configuration
+# Ensure data folder exists for CSV loading/saving
+Path(CSV_FOLDER).mkdir(exist_ok=True)
+
+# CSV Files Configuration (Assumes these files exist in the 'data' folder for the CSV Viewer)
 CSV_FILES = {
     "👔 Vêtements Homme": "vetement_homme.csv",
     "👶 Vêtements Enfant": "vetements_enfant.csv",
@@ -36,7 +40,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS
+# Modern Professional CSS (KEEP AS IS)
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
@@ -333,13 +337,19 @@ def save_to_database(df, table_name, column_name):
         if 'scrape_date' not in df.columns:
             df['scrape_date'] = pd.Timestamp.now()
         
+        # Rename the category-specific column in the DataFrame to match the DB schema
+        # Assuming the DataFrame has one column that matches the category's 'column' name
+        # We ensure the DF only contains the columns expected by the DB table.
+        df_to_save = df[[column_name, 'price', 'adress', 'img']].copy()
+        df_to_save['scrape_date'] = pd.Timestamp.now()
+        
         # Append to table
-        df.to_sql(table_name, conn, if_exists='append', index=False)
+        df_to_save.to_sql(table_name, conn, if_exists='append', index=False)
         
         conn.close()
         return True
     except Exception as e:
-        st.error(f"❌ Database error: {str(e)}")
+        st.error(f"❌ Database error during save: {str(e)}")
         return False
 
 def get_from_database(table_name):
@@ -350,7 +360,7 @@ def get_from_database(table_name):
         conn.close()
         return df
     except Exception as e:
-        st.error(f"❌ Database error: {str(e)}")
+        st.error(f"❌ Database error during retrieval: {str(e)}")
         return pd.DataFrame()
 
 def get_database_stats():
@@ -375,20 +385,51 @@ def get_database_stats():
 
 def scrape_category(url, num_pages, column_name):
     data = []
-    for i in range(num_pages):
+    
+    # Check if a progress bar is available in session state
+    if 'progress_bar' in st.session_state:
+        progress_bar = st.session_state['progress_bar']
+    else:
+        # Fallback for testing/direct use, though Streamlit UI handles it better
+        progress_bar = st.empty()
+
+    for i in range(1, num_pages + 1): # Start from page 1 up to num_pages
         try:
-            time.sleep(0.5)
+            time.sleep(1) # Be polite! Increased delay
             page_url = f'{url}?page={i}'
-            res = get(page_url)
+            
+            # Use a short timeout to prevent hanging forever
+            res = get(page_url, timeout=10) 
+            
+            if res.status_code != 200:
+                 st.warning(f"⚠️ Page {i} returned status code {res.status_code}. Stopping.")
+                 break
+
             soup = bs(res.content, 'html.parser')
+            # Check for empty results page - Coinafrique uses a simple layout 
+            if "no-results" in res.text or not soup.find('div', class_='col s6 m4 l3'):
+                st.info(f"ℹ️ No more results found on page {i}. Stopping scraping.")
+                break
+                
             containers = soup.find_all('div', class_='col s6 m4 l3')
+            
+            if not containers:
+                st.info(f"ℹ️ No containers found on page {i}. Stopping scraping.")
+                break
+                
             for container in containers:
                 try:
-                    item_type = container.find('p', 'ad__card-description').text.strip()
-                    price = container.find('p', class_='ad__card-price').text.replace('CFA', '').strip()
-                    adress = container.find('p', class_='ad__card-location').text.strip()
+                    # Extraction des champs
+                    item_type_tag = container.find('p', 'ad__card-description')
+                    price_tag = container.find('p', class_='ad__card-price')
+                    adress_tag = container.find('p', class_='ad__card-location')
                     img_tag = container.find('img', class_='ad__card-img')
+                    
+                    item_type = item_type_tag.text.strip() if item_type_tag else "N/A"
+                    price = price_tag.text.replace('CFA', '').strip() if price_tag else "N/A"
+                    adress = adress_tag.text.strip() if adress_tag else "N/A"
                     img = img_tag['src'] if img_tag and 'src' in img_tag.attrs else "No Image"
+                    
                     dic = {
                         column_name: item_type,
                         'price': price,
@@ -396,43 +437,87 @@ def scrape_category(url, num_pages, column_name):
                         'img': img
                     }
                     data.append(dic)
-                except:
+                except Exception as e_item:
+                    # Ignore items that fail to parse
+                    # st.warning(f"Item parsing error: {e_item}") 
                     pass
-        except:
-            pass
+            
+            # Update progress bar
+            progress = int((i / num_pages) * 100)
+            if progress_bar:
+                progress_bar.progress(progress)
+                
+        except Exception as e:
+            st.error(f"❌ Error scraping page {i}: {e}")
+            break
+            
+    # Finalize progress bar
+    if progress_bar:
+        progress_bar.progress(100)
+    
     return pd.DataFrame(data)
 
 def clean_price(price_str):
+    """Converts price string to float, handling formatting and non-numeric values."""
     try:
-        cleaned = str(price_str).replace(' ', '').replace(',', '').replace('.', '')
-        return float(cleaned) if cleaned.isdigit() else 0
+        # Remove spaces, commas, periods (common French/African formatting) and keep only digits/known characters
+        cleaned = str(price_str).strip().upper()
+        if 'FCFA' in cleaned: cleaned = cleaned.replace('FCFA', '')
+        if 'CFA' in cleaned: cleaned = cleaned.replace('CFA', '')
+        
+        # Remove non-digit characters except for space (to handle thousands separation before removal)
+        cleaned = ''.join(c for c in cleaned if c.isdigit() or c in ' ')
+        cleaned = cleaned.replace(' ', '')
+        
+        return float(cleaned) if cleaned.isdigit() and cleaned else 0.0
     except:
-        return 0
+        return 0.0
 
 def create_charts_for_category(df, cat_name, cat_color):
+    """Generates a 4-panel analysis plot."""
     df['price_numeric'] = df['price'].apply(clean_price)
     df_clean = df[df['price_numeric'] > 0]
+    
     if len(df_clean) < 10:
         return None
+    
     sns.set_style("whitegrid")
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle(f'Data Analysis - {cat_name}', fontsize=20, fontweight='bold', y=1.0)
     
+    # 1. Price Distribution (Histogram + KDE)
     prices = df_clean['price_numeric'].values
     if len(np.unique(prices)) > 1 and len(prices) > 1:
-        axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black', density=True)
-        kde = stats.gaussian_kde(prices)
-        x_range = np.linspace(prices.min(), prices.max(), 200)
-        axes[0, 0].plot(x_range, kde(x_range), color=cat_color, linewidth=3, label='KDE')
+        # Use log scale for x-axis if max price is much larger than the 75th percentile
+        is_skewed = np.percentile(prices, 75) * 5 < prices.max()
+        
+        axes[0, 0].hist(prices, bins=50, alpha=0.3, color=cat_color, edgecolor='black', density=True, log=False)
+        
+        if is_skewed:
+            # Better visualization for highly skewed price data
+            axes[0, 0].set_xscale('log')
+            axes[0, 0].set_xlabel('Price (CFA) - Log Scale', fontsize=12)
+        else:
+            axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
+            
+        try:
+            kde = stats.gaussian_kde(prices)
+            x_range = np.linspace(prices.min(), prices.max(), 200)
+            axes[0, 0].plot(x_range, kde(x_range), color='darkred', linewidth=3, label='KDE')
+            axes[0, 0].legend()
+        except:
+             # Fails if prices are too clustered
+             pass
+
         axes[0, 0].set_ylabel('Density', fontsize=12)
     else:
-        axes[0, 0].hist(prices, bins=1, color=cat_color, edgecolor='black')
-        axes[0, 0].set_ylabel('Frequency', fontsize=12)
+        axes[0, 0].text(0.5, 0.5, 'Not enough variation for distribution plot', ha='center', va='center')
+        axes[0, 0].set_title('Price Distribution', fontsize=14, fontweight='bold')
+    
     axes[0, 0].set_title('Price Distribution', fontsize=14, fontweight='bold')
-    axes[0, 0].set_xlabel('Price (CFA)', fontsize=12)
-    axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
     
+    # 2. Top 10 Locations
     top_locations = df['adress'].value_counts().head(10)
     if not top_locations.empty:
         axes[0, 1].barh(range(len(top_locations)), top_locations.values, color=cat_color)
@@ -442,16 +527,21 @@ def create_charts_for_category(df, cat_name, cat_color):
         axes[0, 1].set_title('Top 10 Locations', fontsize=14, fontweight='bold')
         axes[0, 1].set_xlabel('Number of Ads', fontsize=12)
         axes[0, 1].grid(True, alpha=0.3, axis='x')
-    
+    else:
+        axes[0, 1].text(0.5, 0.5, 'No location data', ha='center', va='center')
+        axes[0, 1].set_title('Top 10 Locations', fontsize=14, fontweight='bold')
+        
+    # 3. Price Box Plot
     bp = axes[1, 0].boxplot(df_clean['price_numeric'], vert=True, patch_artist=True,
-                            showmeans=True, meanline=True, labels=['Price'])
+                             showmeans=True, meanline=True, labels=['Price'])
     for patch in bp['boxes']:
         patch.set_facecolor(cat_color)
         patch.set_alpha(0.7)
-    axes[1, 0].set_title('Price Box Plot', fontsize=14, fontweight='bold')
+    axes[1, 0].set_title('Price Box Plot (Outliers Included)', fontsize=14, fontweight='bold')
     axes[1, 0].set_ylabel('Price (CFA)', fontsize=12)
     axes[1, 0].grid(True, alpha=0.3, axis='y')
     
+    # 4. Price by Quartile
     if len(df_clean['price_numeric'].unique()) >= 4:
         try:
             quartiles = pd.qcut(df_clean['price_numeric'], q=4, labels=['Q1 (Low)', 'Q2', 'Q3', 'Q4 (High)'], duplicates='drop')
@@ -459,12 +549,16 @@ def create_charts_for_category(df, cat_name, cat_color):
             axes[1, 1].bar(range(len(quartile_counts)), quartile_counts.values, color=cat_color, alpha=0.7)
             axes[1, 1].set_xticks(range(len(quartile_counts)))
             axes[1, 1].set_xticklabels(quartile_counts.index, fontsize=10)
-            axes[1, 1].set_title('Price by Quartile', fontsize=14, fontweight='bold')
+            axes[1, 1].set_title('Price by Quartile Count', fontsize=14, fontweight='bold')
             axes[1, 1].set_xlabel('Quartile', fontsize=12)
             axes[1, 1].set_ylabel('Count', fontsize=12)
             axes[1, 1].grid(True, alpha=0.3, axis='y')
         except:
-            axes[1, 1].text(0.5, 0.5, 'Not enough data', ha='center', va='center')
+            axes[1, 1].text(0.5, 0.5, 'Not enough unique prices for 4 quartiles', ha='center', va='center')
+            axes[1, 1].set_title('Price by Quartile Count', fontsize=14, fontweight='bold')
+    else:
+        axes[1, 1].text(0.5, 0.5, 'Not enough data (need at least 4 unique prices)', ha='center', va='center')
+        axes[1, 1].set_title('Price by Quartile Count', fontsize=14, fontweight='bold')
     
     plt.tight_layout()
     return fig
@@ -479,27 +573,41 @@ def load_csv_file(filename):
             df = pd.read_csv(filepath)
             return df
         else:
-            st.error(f"❌ File not found: {filepath}")
+            # Handle case where file might not exist locally
+            st.error(f"❌ Fichier non trouvé: {filepath}. Veuillez vous assurer qu'il est dans le dossier 'data'.")
             return None
     except Exception as e:
-        st.error(f"❌ Error loading file: {str(e)}")
+        st.error(f"❌ Erreur lors du chargement du fichier: {str(e)}")
         return None
 
 # ========================== INITIALIZE DATABASE ==========================
 init_database()
+
+# ========================== SESSION STATE INITIALIZATION ==========================
+if 'page' not in st.session_state:
+    st.session_state['page'] = "🏠 Welcome"
+if 'last_scraped_df' not in st.session_state:
+    st.session_state['last_scraped_df'] = pd.DataFrame()
+if 'last_scraped_category' not in st.session_state:
+    st.session_state['last_scraped_category'] = ""
 
 # ========================== SIDEBAR ==========================
 st.sidebar.markdown("## 🧭 Navigation")
 page_selection = st.sidebar.radio(
     "Go to",
     ["🏠 Welcome", "📊 Scrape & Analyze", "📁 View CSV Files", "💾 Database Manager"],
-    index=0
+    index=["🏠 Welcome", "📊 Scrape & Analyze", "📁 View CSV Files", "💾 Database Manager"].index(st.session_state['page'])
 )
+st.session_state['page'] = page_selection
 
+
+# Default sidebar selections for 'Scrape & Analyze' page
 selected_category = list(CATEGORIES.keys())[0]
 num_pages = 5
 option_choice = "Scrape data using BeautifulSoup"
 
+
+# Dynamic sidebar settings for 'Scrape & Analyze'
 if page_selection == "📊 Scrape & Analyze":
     st.sidebar.markdown("---")
     st.sidebar.markdown("## ⚙️ Settings")
@@ -523,8 +631,8 @@ if page_selection == "📊 Scrape & Analyze":
         "🎯 Action",
         [
             "Scrape data using BeautifulSoup",
-            "Download scraped data",
             "Data Dashboard",
+            "Download scraped data",
             "Evaluate the App"
         ]
     )
@@ -532,7 +640,7 @@ if page_selection == "📊 Scrape & Analyze":
     st.sidebar.markdown("---")
     st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {int(num_pages)}")
 
-# Database stats in sidebar
+# Database stats in sidebar for 'Database Manager'
 if page_selection == "💾 Database Manager":
     st.sidebar.markdown("---")
     st.sidebar.markdown("## 📊 Database Stats")
@@ -577,28 +685,6 @@ if page_selection == "🏠 Welcome":
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        <div class="feature-card" style="text-align: center;">
-            <span class="feature-icon">📁</span>
-            <h3 class="feature-title">CSV Viewer</h3>
-            <p class="feature-text">View and download pre-collected CSV data files</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="feature-card" style="text-align: center;">
-            <span class="feature-icon">💾</span>
-            <h3 class="feature-title">Database Manager</h3>
-            <p class="feature-text">Store and manage scraped data in SQLite database</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown("""
@@ -608,10 +694,12 @@ if page_selection == "🏠 Welcome":
         </div>
         """, unsafe_allow_html=True)
         
+        # Change page without rerunning the entire script using Streamlit's internal mechanism
         if st.button("🎬 START SCRAPING NOW", key="start"):
             st.session_state['page'] = "📊 Scrape & Analyze"
             st.rerun()
 
+# --- CSV VIEWER PAGE ---
 elif page_selection == "📁 View CSV Files":
     st.markdown('<h1 class="main-title">📁 CSV Files Viewer</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">View and download pre-collected data from CSV files</p>', unsafe_allow_html=True)
@@ -630,12 +718,12 @@ elif page_selection == "📁 View CSV Files":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button(f"📂 LOAD {selected_file}", use_container_width=True):
-            with st.spinner("Loading CSV file..."):
+            with st.spinner(f"Loading CSV file **{filename}**..."):
                 df = load_csv_file(filename)
                 
                 if df is not None:
                     st.session_state[f'csv_data_{selected_file}'] = df
-                    st.success(f"✅ Successfully loaded **{len(df)} rows** from {filename}")
+                    st.success(f"✅ Successfully loaded **{len(df):,} rows** from {filename}")
     
     # Display loaded data
     if f'csv_data_{selected_file}' in st.session_state:
@@ -647,7 +735,7 @@ elif page_selection == "📁 View CSV Files":
         # Metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("📦 Total Rows", len(df))
+            st.metric("📦 Total Rows", f"{len(df):,}")
         with col2:
             st.metric("📋 Columns", len(df.columns))
         with col3:
@@ -669,29 +757,34 @@ elif page_selection == "📁 View CSV Files":
         # Download button
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            csv = df.to_csv(index=False).encode('utf-8')
+            # Use io.StringIO for CSV export
+            csv_buffer = io.StringIO()
+            df.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue().encode('utf-8')
+            
             st.download_button(
                 f"📥 DOWNLOAD {selected_file}",
-                csv,
+                csv_data,
                 filename,
                 "text/csv",
                 use_container_width=True,
                 key=f"download_{selected_file}"
             )
-        
+            
         # Product preview with images (if img column exists)
-        if 'img' in df.columns:
+        if 'img' in df.columns and not df.empty:
             st.markdown("### 🖼️ Product Preview")
             cols = st.columns(5)
             for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
                 with col:
-                    img_url = row.img if hasattr(row, 'img') and row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
+                    img_url = row.img if hasattr(row, 'img') and row.img != "No Image" and row.img and str(row.img).startswith('http') else "https://via.placeholder.com/300x400.png?text=No+Image"
                     st.image(img_url, use_container_width=True)
                     if hasattr(row, 'price'):
-                        st.caption(f"💰 {row.price} CFA")
+                        st.caption(f"💰 {row.price}")
                     if hasattr(row, 'adress'):
-                        st.caption(f"📍 {row.adress[:15]}...")
+                        st.caption(f"📍 {str(row.adress)[:15]}...")
 
+# --- DATABASE MANAGER PAGE ---
 elif page_selection == "💾 Database Manager":
     st.markdown('<h1 class="main-title">💾 Database Manager</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Manage scraped data stored in SQLite database</p>', unsafe_allow_html=True)
@@ -727,7 +820,7 @@ elif page_selection == "💾 Database Manager":
         
         if not df_db.empty:
             st.session_state[f'db_data_{selected_db_cat}'] = df_db
-            st.success(f"✅ Loaded {len(df_db)} records from database")
+            st.success(f"✅ Loaded {len(df_db):,} records from database")
         else:
             st.warning("⚠️ No data found in database for this category")
     
@@ -740,27 +833,158 @@ elif page_selection == "💾 Database Manager":
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            csv = df_db.to_csv(index=False).encode('utf-8')
+            csv_buffer = io.StringIO()
+            df_db.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue().encode('utf-8')
+            
             st.download_button(
                 "📥 DOWNLOAD FROM DATABASE",
-                csv,
+                csv_data,
                 f"database_{selected_db_cat.lower().replace(' ', '_')}.csv",
                 "text/csv",
                 use_container_width=True,
                 key=f"download_db_{selected_db_cat}"
             )
 
+# --- SCRAPE & ANALYZE PAGE ---
 elif page_selection == "📊 Scrape & Analyze":
     cat_info = CATEGORIES[selected_category]
     
     st.markdown('<h1 class="main-title">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Extract and analyze fashion market data from Coinafrique Senegal</p>', unsafe_allow_html=True)
     
-    st.markdown(f"**Category:** {selected_category} | **Source:** [View on Coinafrique]({cat_info['url']})")
+    st.markdown(f"**Category:** {selected_category} | **Pages to Scrape:** {num_pages} | **Source:** [View on Coinafrique]({cat_info['url']})")
     st.markdown("<br>", unsafe_allow_html=True)
     
+    
+    # --- ACTION: SCRAPE DATA ---
     if option_choice == "Scrape data using BeautifulSoup":
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button(f"{cat_info['icon']} SCRAPE {selected_category.upper()}", use_container_width=True):
-                progress_bar = st.progress(0)
+                
+                status_container = st.empty()
+                status_container.info(f"⏳ Starting scraping for **{num_pages} pages** of {selected_category}...")
+                
+                # Use a progress bar
+                progress_container = st.empty()
+                st.session_state['progress_bar'] = progress_container.progress(0)
+                
+                try:
+                    df_scraped = scrape_category(cat_info['url'], int(num_pages), cat_info['column'])
+                    
+                    if not df_scraped.empty:
+                        # 1. Store the scraped DF for immediate use (Download)
+                        st.session_state['last_scraped_df'] = df_scraped
+                        st.session_state['last_scraped_category'] = selected_category
+                        
+                        # 2. Save to database
+                        save_success = save_to_database(df_scraped, cat_info['table'], cat_info['column'])
+                        
+                        status_container.success(f"✅ Scraping completed! **{len(df_scraped):,} records** found.")
+                        
+                        if save_success:
+                            st.success(f"💾 Data saved to database table: **{cat_info['table']}**")
+                        
+                        st.markdown("### 📋 Scraped Data Preview (First 50 rows)")
+                        st.dataframe(df_scraped.head(50), use_container_width=True, height=300)
+                        
+                    else:
+                        status_container.error("❌ Scraping failed or no data found.")
+                        
+                except Exception as e:
+                    status_container.error(f"❌ An unexpected error occurred during scraping: {e}")
+                finally:
+                    # Clear the progress bar and status message after completion
+                    st.session_state['progress_bar'].empty()
+                    del st.session_state['progress_bar']
+
+    # --- ACTION: DATA DASHBOARD ---
+    elif option_choice == "Data Dashboard":
+        st.markdown(f"## 📊 Data Dashboard: {selected_category}")
+        
+        # Retrieve all data for analysis
+        table_name = cat_info['table']
+        df_analysis = get_from_database(table_name)
+        
+        if not df_analysis.empty:
+            st.info(f"Loading analysis for **{len(df_analysis):,} records** from the database.")
+            
+            # Display Metrics
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("📦 Total Records", f"{len(df_analysis):,}")
+            with col2:
+                latest_date = pd.to_datetime(df_analysis['scrape_date']).max().strftime('%Y-%m-%d %H:%M')
+                st.metric("⏱️ Last Scrape Date", latest_date)
+            
+            df_analysis['price_numeric'] = df_analysis['price'].apply(clean_price)
+            df_clean = df_analysis[df_analysis['price_numeric'] > 0]
+            
+            with col3:
+                avg = df_clean['price_numeric'].mean()
+                st.metric("💰 Avg Price", f"{avg:,.0f} CFA" if avg > 0 else "N/A")
+            with col4:
+                st.metric("📍 Unique Locations", df_analysis['adress'].nunique())
+
+            st.markdown("---")
+            
+            # Create and display the charts
+            fig = create_charts_for_category(df_analysis, selected_category, cat_info['color'])
+            
+            if fig:
+                st.pyplot(fig) 
+            else:
+                st.warning("⚠️ Not enough cleaned data (less than 10 records with valid price) to generate charts. Try scraping more pages.")
+                
+        else:
+            st.warning("⚠️ No data found in the database for this category. Please run the **Scrape** action first.")
+
+
+    # --- ACTION: DOWNLOAD SCRAPED DATA ---
+    elif option_choice == "Download scraped data":
+        st.markdown("## 📥 Download Data")
+        
+        # Try to use the last scraped data first
+        if not st.session_state['last_scraped_df'].empty and st.session_state['last_scraped_category'] == selected_category:
+            df_to_download = st.session_state['last_scraped_df']
+            cat_name = st.session_state['last_scraped_category']
+            st.info(f"Data available for download (Last Scrape: **{len(df_to_download):,} records** of {cat_name}).")
+        else:
+            # Fallback: load from database
+            table_name = cat_info['table']
+            df_to_download = get_from_database(table_name)
+            cat_name = selected_category
+            st.info(f"Data loaded from Database for download: **{len(df_to_download):,} records** of {cat_name}.")
+
+
+        if not df_to_download.empty:
+            st.dataframe(df_to_download.head(10))
+            
+            csv_buffer = io.StringIO()
+            df_to_download.to_csv(csv_buffer, index=False)
+            csv_data = csv_buffer.getvalue().encode('utf-8')
+            
+            st.download_button(
+                f"📥 DOWNLOAD {cat_name.upper()} CSV",
+                csv_data,
+                f"scraped_data_{cat_name.lower().replace(' ', '_')}.csv",
+                "text/csv",
+                use_container_width=True
+            )
+        else:
+            st.warning("⚠️ No data available to download. Please run the **Scrape** action first.")
+
+    # --- ACTION: EVALUATE THE APP ---
+    elif option_choice == "Evaluate the App":
+        st.markdown("## ⭐ Evaluate the App")
+        st.info("Your feedback is important! Please take a moment to evaluate the tool.")
+        
+        col_form, col_kobo = st.columns(2)
+        with col_form:
+            st.markdown(f'<div class="stLinkButton"><a href="{GOOGLE_FORMS_LINK}" target="_blank">📝 GOOGLE FORMS</a></div>', unsafe_allow_html=True)
+        with col_kobo:
+            st.markdown(f'<div class="stLinkButton" style="background: linear-gradient(135deg, #00897b 0%, #26a69a 100%) !important;"><a href="{KOBOTOOLBOX_LINK}" target="_blank">🗄️ KOBOTOOLBOX</a></div>', unsafe_allow_html=True)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.info("The links above open external forms to submit your evaluation.")
