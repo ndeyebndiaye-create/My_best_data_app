@@ -1,23 +1,36 @@
-[theme]
-# Définit le thème de base comme clair, pour correspondre au CSS
-base = "light"
-
-# Couleur principale pour les éléments natifs (curseurs, indicateurs)
-primaryColor = "#1976d2"       # Bleu Ciel Moyen
-
-# Couleur de fond principale
-backgroundColor = "#F5F7FA"    # Gris très clair
-
-# Couleur de fond secondaire (pour la sidebar par défaut)
-secondaryBackgroundColor = "#ffffff" # Blanc pur
-
-# Couleur de texte pour les widgets Streamlit non stylisés
-textColor = "#1a237e"          # Bleu Marine très foncé
-
-# Famille de police par défaut
-font = "sans serif"
-
 [server]
-# Paramètres de sécurité et de compatibilité (décommenter si nécessaire)
-# enableCORS = true
-# enableXsrfProtection = true
+# Empêche Streamlit de s'ouvrir dans le navigateur par défaut après le démarrage
+# runOnSave = false 
+
+[client]
+# Active le re-run automatique lorsque le code est modifié (par défaut: true)
+# showSidebarNavigation = true
+
+[browser]
+# Pour utiliser l'emoji de la page comme titre dans l'onglet du navigateur
+# gatherUseStats = false
+
+[theme]
+# Couleur primaire utilisée pour les boutons et les widgets
+primaryColor="#1565c0" 
+
+# Couleur de fond (arrière-plan) principale. 
+# La couleur très claire est cohérente avec le dégradé 'f5f7fa' de votre .stApp.
+backgroundColor="#f5f7fa" 
+
+# Couleur de fond des éléments de la sidebar et des widgets (cards, selectboxes)
+# Nous utilisons un bleu foncé pour la sidebar (cohérent avec le CSS), mais le reste doit être blanc pour le style actuel.
+secondaryBackgroundColor="#f0f2f6" 
+
+# Couleur du texte principal
+textColor="#303030" 
+
+# Style de police (assurez-vous que la police est disponible/importée comme vous l'avez fait avec Poppins)
+font="sans serif"
+
+[global]
+# Utiliser une largeur maximale plus grande pour le contenu de la page pour le mode 'wide' (par défaut: 730px)
+# Cela est crucial pour que le layout 'wide' soit efficace.
+# Le 'layout="wide"' dans st.set_page_config utilise la pleine largeur disponible.
+# set_page_config(layout="wide") est utilisé, donc ceci n'est pas strictement nécessaire mais peut aider à la cohérence.
+# maxMessageSize = 200
