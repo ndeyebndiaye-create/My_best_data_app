@@ -1,42 +1,24 @@
 [theme]
-# Thème professionnel bleu
-primaryColor = "#1976d2"
-backgroundColor = "#f5f7fa"
-secondaryBackgroundColor = "#ffffff"
-textColor = "#263238"
+# Définit le thème de base comme clair, ce qui correspond à votre CSS
+base = "light"
+
+# Couleurs personnalisées basées sur votre thème Bleu Marine/Ciel
+# primaryColor : Couleur utilisée pour les éléments Streamlit (curseurs, indicateurs de progrès)
+primaryColor = "#1976d2"       # Bleu Ciel Moyen (correspond à l'une de vos couleurs de gradient)
+
+# backgroundColor : Couleur de fond de l'application (le CSS la remplace par un gradient)
+backgroundColor = "#F5F7FA"    # Gris très clair (similaire à la base de votre gradient CSS)
+
+# secondaryBackgroundColor : Couleur pour la barre latérale et les conteneurs (le CSS la remplace pour la sidebar)
+secondaryBackgroundColor = "#ffffff" # Blanc pur
+
+# textColor : Couleur de texte standard pour les widgets Streamlit non stylisés
+textColor = "#1a237e"          # Bleu Marine très foncé (couleur de base de votre sidebar)
+
+# font : Définit la famille de police par défaut
 font = "sans serif"
 
 [server]
-# Configuration serveur
-port = 8501
-enableCORS = false
-enableXsrfProtection = true
-maxUploadSize = 200
-enableWebsocketCompression = true
-
-[browser]
-# Configuration navigateur
-gatherUsageStats = false
-serverAddress = "localhost"
-serverPort = 8501
-
-[runner]
-# Optimisation des performances
-magicEnabled = true
-installTracer = false
-fixMatplotlib = true
-fastReruns = true
-
-[client]
-# Interface utilisateur
-showErrorDetails = true
-toolbarMode = "auto"
-
-[logger]
-# Logs
-level = "info"
-messageFormat = "%(asctime)s - %(levelname)s - %(message)s"
-
-[deprecation]
-# Gestion des avertissements
-showPyplotGlobalUse = false
+# Utilisé pour améliorer la compatibilité et la sécurité
+# enableCORS = true
+# enableXsrfProtection = true
