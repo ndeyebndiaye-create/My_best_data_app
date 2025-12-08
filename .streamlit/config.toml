@@ -1,18 +1,19 @@
 [server]
 # runOnSave = true
+# Si mis à true, redémarre l'application à chaque sauvegarde du fichier Python.
 
 [theme]
-# Couleur primaire (boutons, liens) en bleu foncé
+# Couleur primaire utilisée pour les éléments interactifs comme les boutons et les liens.
 primaryColor="#1565c0" 
 
-# Couleur de fond principale (arrière-plan du stApp)
+# Couleur de fond principale de l'application (l'arrière-plan du stApp, derrière les conteneurs).
 backgroundColor="#f5f7fa" 
 
-# Couleur de fond des composants (cartes, selectboxes, etc.)
+# Couleur de fond secondaire utilisée pour les boîtes (selectboxes, tables) et la barre latérale.
 secondaryBackgroundColor="#f0f2f6" 
 
-# Couleur du texte
+# Couleur du texte par défaut.
 textColor="#303030" 
 
-# Police utilisée
+# Police utilisée.
 font="sans serif"
