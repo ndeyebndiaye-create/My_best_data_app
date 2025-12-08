@@ -20,7 +20,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Professional CSS with Fashion Theme
+# Modern Professional CSS with Fashion Theme (OPACITY FIX APPLIED HERE)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
@@ -45,9 +45,10 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* ALL ACTION PAGES - Shopping Bags Background */
+    /* ALL ACTION PAGES - Shopping Bags Background (OPACITY FIX) */
     .scraping-page, .download-page, .dashboard-page, .evaluation-page {
-        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(250, 250, 250, 0.95)),
+        /* CHANGED OPACITY: 0.95 -> 0.98 for better readability */
+        background: linear-gradient(rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.98)),
                     url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
         background-size: cover;
         background-position: center;
@@ -163,9 +164,10 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     
-    /* MAIN CONTENT CARD - Plus transparent pour voir le background */
+    /* MAIN CONTENT CARD - Moins transparent pour une meilleure lisibilité (OPACITY FIX) */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.95);
+        /* CHANGED OPACITY: 0.95 -> 0.98 */
+        background: rgba(255, 255, 255, 0.98); 
         border-radius: 20px;
         padding: 3rem;
         margin-top: 2rem;
@@ -508,6 +510,10 @@ if page_selection == "📊 Scrape & Analyze":
     
     st.sidebar.markdown("---")
     st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {int(num_pages)}")
+    
+    # Update page_selection based on st.session_state if button was clicked on welcome page
+    if 'page' in st.session_state and st.session_state.page == "📊 Scrape & Analyze":
+        page_selection = "📊 Scrape & Analyze"
 
 # MAIN CONTENT
 if page_selection == "🏠 Welcome":
@@ -556,8 +562,9 @@ if page_selection == "🏠 Welcome":
         </div>
         """, unsafe_allow_html=True)
         
+        # Use session state to handle page transition if button is clicked
         if st.button("🎬 START SCRAPING NOW", key="start", help="Click to begin"):
-            st.session_state.page = "📊 Scrape & Analyze"
+            st.session_state['page'] = "📊 Scrape & Analyze"
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -565,7 +572,7 @@ if page_selection == "🏠 Welcome":
 else:
     cat_info = CATEGORIES[selected_category]
     
-    # Déterminer quelle classe CSS utiliser selon l'action
+    # Determine which CSS class to use based on action
     if option_choice == "Scrape data using BeautifulSoup":
         page_class = "scraping-page"
     elif option_choice == "Download scraped data":
