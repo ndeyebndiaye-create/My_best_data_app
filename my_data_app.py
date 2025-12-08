@@ -15,7 +15,7 @@ KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
 # Page Configuration
 st.set_page_config(
     page_title="Coinafrique Scraper Pro",
-    page_icon="🛍️", 
+    page_icon="🛍️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -31,8 +31,9 @@ st.markdown("""
     
     /* WELCOME PAGE - Shopping Background */
     .welcome-container {
+        /* Overlay très transparent pour laisser passer le fond */
         background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
+                     url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -45,11 +46,11 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* ALL ACTION PAGES - Shopping Bags Background (OPACITY FIX APPLIED) */
+    /* ALL ACTION PAGES - NEW BACKGROUND & LESS OPACITY (0.90) */
     .scraping-page, .download-page, .dashboard-page, .evaluation-page {
-        /* L'overlay de la page reste à 0.98 pour maximiser la lisibilité du texte */
-        background: linear-gradient(rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.98)),
-                    url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
+        /* CHANGEMENT CRUCIAL: L'overlay est réduit à 0.90 pour mieux voir l'image de fond */
+        background: linear-gradient(rgba(255, 255, 255, 0.90), rgba(250, 250, 250, 0.90)),
+                     url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1920&q=90'); /* Nouvelle image de fond (Bureau d'analyse) */
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -165,16 +166,8 @@ st.markdown("""
     }
     
     /* MAIN CONTENT CARD - Moins transparent (0.85) pour voir l'image de fond */
-    .main .block-container {
-        /* CHANGEMENT: Opacité réduite à 0.85 */
-        background: rgba(255, 255, 255, 0.85); 
-        border-radius: 20px;
-        padding: 3rem;
-        margin-top: 2rem;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.2);
-        border: 1px solid rgba(255,255,255,0.8);
-        backdrop-filter: blur(10px);
-    }
+    /* REMOVED .main .block-container style to apply background to the main div */
+    /* The action-specific div now handles the background and blur */
     
     /* TITLES */
     .main-title {
@@ -586,6 +579,7 @@ else:
     else:
         page_class = "scraping-page"
     
+    # 💡 CHANGEMENT: Applique la classe de la page au conteneur principal de l'action
     st.markdown(f'<div class="{page_class}">', unsafe_allow_html=True)
     
     st.markdown('<h1 class="main-title animated">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
@@ -603,6 +597,11 @@ else:
                 
                 start_time = time.time()
                 status_text.markdown(f"**⏳ Scraping {selected_category}...**")
+                
+                # Simule une progression pour l'exemple
+                for p in range(int(num_pages)):
+                    time.sleep(0.01) # Petite pause pour l'animation
+                    progress_bar.progress((p + 1) / int(num_pages))
                 
                 df = scrape_category(cat_info['url'], int(num_pages), cat_info['column'])
                 
@@ -639,18 +638,20 @@ else:
             
             st.markdown("### 🖼️ Product Preview")
             cols = st.columns(5)
+            # 💡 CHANGEMENT: Assurez-vous que les images sont visibles en utilisant un placeholder si elles sont manquantes
             for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
                 with col:
-                    img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
+                    img_url = row.img if row.img != "No Image" and row.img else "https://via.placeholder.com/300x400.png?text=No+Image"
                     st.image(img_url, use_container_width=True)
                     st.caption(f"💰 {row.price} CFA")
                     st.caption(f"📍 {row.adress[:15]}...")
     
     elif option_choice == "Download scraped data":
+        st.markdown("## 💾 Data Download Center")
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.success(f"✅ {len(available_data)} dataset(s) available")
+            st.success(f"✅ {len(available_data)} dataset(s) available for download")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
@@ -667,18 +668,19 @@ else:
                         key=f"dl_{cat_name}"
                     )
         else:
-            st.warning("⚠️ No data available. Please scrape first.")
+            st.warning("⚠️ No data available. Please scrape first from the 'Scrape data using BeautifulSoup' action.")
     
     elif option_choice == "Data Dashboard":
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
             st.markdown("## 📊 Analytics Dashboard")
+            st.info("Charts are generated only if the dataset has at least 10 entries with valid price data.")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
                 
-                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name}")
+                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name} Analysis")
                 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -697,14 +699,14 @@ else:
                 if fig:
                     st.pyplot(fig)
                 else:
-                    st.warning("⚠️ Need at least 10 items for charts")
+                    st.warning("⚠️ Not enough clean data points (min 10) to generate charts for this category.")
                 
                 st.markdown("---")
         else:
-            st.warning("⚠️ No data available. Please scrape first.")
+            st.warning("⚠️ No data available. Please scrape first from the 'Scrape data using BeautifulSoup' action.")
     
     elif option_choice == "Evaluate the App":
-        st.markdown("## ⭐ Help Us Improve")
+        st.markdown("## ⭐ Help Us Improve - Evaluation")
         st.markdown("Your feedback matters! Choose your preferred platform:")
         
         col1, col2 = st.columns(2)
