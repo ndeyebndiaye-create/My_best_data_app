@@ -8,41 +8,31 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Configuration variables (Fonctionnalités non modifiées)
+# Configuration variables
 GOOGLE_FORMS_LINK = "https://docs.google.com/forms/d/e/1FAIpQLScPZoL1rmqr3nJvRqixQlvBphF4Tbj3MrLd9U6WyQjTLzs5hg/viewform?usp=dialog"
 KOBOTOOLBOX_LINK = "https://ee.kobotoolbox.org/x/LNbLn5W1"
-
-# Nouvelle URL publique pour l'image de fond (Garde-Robe)
-# J'utilise cette URL d'une image de garde-robe organisée :
-WARDROBE_BACKGROUND_URL = "https://i.imgur.com/KqWk3Y3.jpeg"
 
 # Page Configuration
 st.set_page_config(
     page_title="Coinafrique Scraper Pro",
-    page_icon="🛍️",
+    page_icon="🛍️", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- STYLE CSS (Visuel Mise à Jour avec URL publique) ---
-st.markdown(f"""
+# Modern Professional CSS with Fashion Theme
+st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
     
-    * {{
+    * {
         font-family: 'Poppins', sans-serif;
-    }}
+    }
     
-    /* Le fond de l'application Streamlit principal est toujours le dégradé bleu-gris */
-    .stApp {{
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }}
-    
-    /* WELCOME PAGE - Utilise l'image Garde-robe (Opacité 0.92) */
-    .welcome-container {{
-        /* Overlay blanc très transparent pour laisser passer la garde-robe */
+    /* WELCOME PAGE - Shopping Background */
+    .welcome-container {
         background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-                     url('{WARDROBE_BACKGROUND_URL}');
+                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -53,13 +43,12 @@ st.markdown(f"""
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         position: relative;
         overflow: hidden;
-    }}
+    }
     
-    /* ALL ACTION PAGES - Utilise l'image Garde-robe (Opacité 0.90) */
-    .scraping-page, .download-page, .dashboard-page, .evaluation-page {{
-        /* Overlay légèrement plus transparent (0.90) pour mieux voir l'image de fond */
-        background: linear-gradient(rgba(255, 255, 255, 0.90), rgba(250, 250, 250, 0.90)),
-                     url('{WARDROBE_BACKGROUND_URL}');
+    /* ALL ACTION PAGES - Shopping Bags Background */
+    .scraping-page, .download-page, .dashboard-page, .evaluation-page {
+        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(250, 250, 250, 0.95)),
+                    url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -67,25 +56,25 @@ st.markdown(f"""
         padding: 2rem;
         margin: -1rem -2rem;
         min-height: 100vh;
-    }}
+    }
     
-    /* SIDEBAR - Elegant Navy Blue */
-    [data-testid="stSidebar"] {{
-        background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-    }}
+    .welcome-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(21, 101, 192, 0.05) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
     
-    [data-testid="stSidebar"] h1,
-    [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] p {{
-        color: #ffffff !important;
-        font-weight: 600;
-    }}
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
     
-    /* TITLES */
-    .welcome-title {{
+    .welcome-title {
         font-size: 4.5rem;
         font-weight: 900;
         text-align: center;
@@ -97,20 +86,9 @@ st.markdown(f"""
         letter-spacing: 3px;
         position: relative;
         z-index: 1;
-    }}
-
-    .main-title {{
-        font-size: 3.5rem;
-        font-weight: 900;
-        text-align: center;
-        background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #42a5f5 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
-        letter-spacing: 2px;
-    }}
+    }
     
-    .welcome-subtitle, .subtitle {{
+    .welcome-subtitle {
         text-align: center;
         color: #546e7a;
         font-size: 1.4rem;
@@ -119,10 +97,9 @@ st.markdown(f"""
         line-height: 1.8;
         position: relative;
         z-index: 1;
-    }}
+    }
     
-    /* CARDS */
-    .feature-card {{
+    .feature-card {
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(10px);
         border-radius: 20px;
@@ -133,15 +110,93 @@ st.markdown(f"""
         border: 1px solid rgba(21, 101, 192, 0.1);
         position: relative;
         z-index: 1;
-    }}
+    }
     
-    .feature-card:hover {{
+    .feature-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 15px 40px rgba(21, 101, 192, 0.15);
-    }}
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1565c0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-text {
+        color: #546e7a;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    /* MAIN APP BACKGROUND */
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    /* SIDEBAR - Elegant Navy Blue */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p {
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+    
+    [data-testid="stSidebar"] .stRadio > label {
+        background: rgba(255,255,255,0.1);
+        padding: 0.5rem;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+    }
+    
+    /* MAIN CONTENT CARD - Plus transparent pour voir le background */
+    .main .block-container {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-top: 2rem;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* TITLES */
+    .main-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #42a5f5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        letter-spacing: 2px;
+    }
+    
+    .subtitle {
+        text-align: center;
+        color: #546e7a;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        font-weight: 400;
+        line-height: 1.7;
+    }
     
     /* BUTTONS - Primary (Scrape) */
-    .stButton>button {{
+    .stButton>button {
         background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%) !important;
         color: white !important;
         font-weight: 700;
@@ -154,27 +209,27 @@ st.markdown(f"""
         box-shadow: 0 8px 25px rgba(21, 101, 192, 0.4);
         text-transform: uppercase;
         letter-spacing: 1.5px;
-    }}
+    }
     
-    .stButton>button:hover {{
+    .stButton>button:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 40px rgba(21, 101, 192, 0.6);
         background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%) !important;
-    }}
+    }
     
     /* START BUTTON (Welcome Page) */
-    .start-button {{
+    .start-button {
         background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%) !important;
         box-shadow: 0 10px 30px rgba(76, 175, 80, 0.5);
-    }}
+    }
     
-    .start-button:hover {{
+    .start-button:hover {
         background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%) !important;
         box-shadow: 0 15px 40px rgba(76, 175, 80, 0.7);
-    }}
+    }
     
     /* DOWNLOAD BUTTON */
-    .stDownloadButton > button {{
+    .stDownloadButton > button {
         background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%) !important;
         color: white !important;
         font-weight: 700;
@@ -183,65 +238,67 @@ st.markdown(f"""
         box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
         border: none;
         text-transform: uppercase;
-    }}
+    }
     
-    .stDownloadButton > button:hover {{
+    .stDownloadButton > button:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(255, 152, 0, 0.6);
-    }}
+    }
     
     /* METRICS */
-    [data-testid="stMetricValue"] {{
+    [data-testid="stMetricValue"] {
         color: #1565c0;
         font-weight: 800;
         font-size: 2rem;
-    }}
+    }
     
-    [data-testid="stMetricLabel"] {{
+    [data-testid="stMetricLabel"] {
         color: #546e7a;
         font-weight: 600;
-    }}
+    }
     
-    /* ALERTS & PROGRESS BARS */
-    .stAlert {{
+    /* ALERTS */
+    .stAlert {
         border-radius: 12px;
         border-left: 5px solid #1976d2;
         background: rgba(25, 118, 210, 0.05);
-    }}
+    }
     
-    .stProgress > div > div {{
+    /* PROGRESS BAR */
+    .stProgress > div > div {
         background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%);
         border-radius: 10px;
-    }}
+    }
     
-    /* IMAGES & DATAFRAME */
-    [data-testid="stDataFrame"] {{
+    /* DATAFRAME */
+    [data-testid="stDataFrame"] {
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    }}
+    }
     
-    img {{
+    /* IMAGES */
+    img {
         border-radius: 15px;
         transition: all 0.3s ease;
         box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    }}
+    }
     
-    img:hover {{
+    img:hover {
         transform: scale(1.05);
         box-shadow: 0 10px 35px rgba(21, 101, 192, 0.3);
-    }}
+    }
     
     /* SEPARATOR */
-    hr {{
+    hr {
         border: none;
         height: 2px;
         background: linear-gradient(90deg, transparent 0%, #1976d2 50%, transparent 100%);
         margin: 2rem 0;
-    }}
+    }
     
     /* LINK BUTTONS (Evaluation) */
-    .stLinkButton > a {{
+    .stLinkButton > a {
         background: linear-gradient(135deg, #00897b 0%, #26a69a 100%) !important;
         color: white !important;
         font-weight: 700;
@@ -253,32 +310,32 @@ st.markdown(f"""
         text-align: center;
         box-shadow: 0 6px 20px rgba(0, 137, 123, 0.4);
         transition: all 0.3s ease;
-    }}
+    }
     
-    .stLinkButton > a:hover {{
+    .stLinkButton > a:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(0, 137, 123, 0.6);
-    }}
+    }
     
-    /* ANIMATIONS (Unchanged) */
-    @keyframes fadeInUp {{
-        from {{
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+        from {
             opacity: 0;
             transform: translateY(30px);
-        }}
-        to {{
+        }
+        to {
             opacity: 1;
             transform: translateY(0);
-        }}
-    }}
+        }
+    }
     
-    .animated {{
+    .animated {
         animation: fadeInUp 0.8s ease-out;
-    }}
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Category Configuration (Fonctionnalités non modifiées)
+# Category Configuration
 CATEGORIES = {
     "Men's Clothing": {
         "url": "https://sn.coinafrique.com/categorie/vetements-homme",
@@ -306,7 +363,7 @@ CATEGORIES = {
     }
 }
 
-# Functions (Scraping and Charting - Non modifiées)
+# Functions
 def scrape_category(url, num_pages, column_name):
     data = []
     for i in range(num_pages):
@@ -401,10 +458,8 @@ def create_charts_for_category(df, cat_name, cat_color):
             axes[1, 1].set_xlabel('Quartile', fontsize=12)
             axes[1, 1].set_ylabel('Count', fontsize=12)
             axes[1, 1].grid(True, alpha=0.3, axis='y')
-        except Exception as e:
-            axes[1, 1].text(0.5, 0.5, f'Quartile error: {e}', ha='center', va='center')
-    else:
-        axes[1, 1].text(0.5, 0.5, 'Not enough unique data points for quartiles', ha='center', va='center')
+        except:
+            axes[1, 1].text(0.5, 0.5, 'Not enough data for quartiles', ha='center', va='center')
     
     plt.tight_layout()
     return fig
@@ -453,10 +508,6 @@ if page_selection == "📊 Scrape & Analyze":
     
     st.sidebar.markdown("---")
     st.sidebar.info(f"**Category:** {selected_category}\n\n**Pages:** {int(num_pages)}")
-    
-    # Update page_selection based on st.session_state if button was clicked on welcome page
-    if 'page' in st.session_state and st.session_state.page == "📊 Scrape & Analyze":
-        page_selection = "📊 Scrape & Analyze"
 
 # MAIN CONTENT
 if page_selection == "🏠 Welcome":
@@ -505,9 +556,8 @@ if page_selection == "🏠 Welcome":
         </div>
         """, unsafe_allow_html=True)
         
-        # Use session state to handle page transition if button is clicked
         if st.button("🎬 START SCRAPING NOW", key="start", help="Click to begin"):
-            st.session_state['page'] = "📊 Scrape & Analyze"
+            st.session_state.page = "📊 Scrape & Analyze"
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -515,7 +565,7 @@ if page_selection == "🏠 Welcome":
 else:
     cat_info = CATEGORIES[selected_category]
     
-    # Determine which CSS class to use based on action
+    # Déterminer quelle classe CSS utiliser selon l'action
     if option_choice == "Scrape data using BeautifulSoup":
         page_class = "scraping-page"
     elif option_choice == "Download scraped data":
@@ -527,7 +577,6 @@ else:
     else:
         page_class = "scraping-page"
     
-    # Applique la classe de la page au conteneur principal de l'action
     st.markdown(f'<div class="{page_class}">', unsafe_allow_html=True)
     
     st.markdown('<h1 class="main-title animated">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
@@ -545,11 +594,6 @@ else:
                 
                 start_time = time.time()
                 status_text.markdown(f"**⏳ Scraping {selected_category}...**")
-                
-                # Simule une progression pour l'exemple
-                for p in range(int(num_pages)):
-                    time.sleep(0.01) # Petite pause pour l'animation
-                    progress_bar.progress((p + 1) / int(num_pages))
                 
                 df = scrape_category(cat_info['url'], int(num_pages), cat_info['column'])
                 
@@ -586,20 +630,18 @@ else:
             
             st.markdown("### 🖼️ Product Preview")
             cols = st.columns(5)
-            # Affiche des images visibles ou un placeholder
             for idx, (col, row) in enumerate(zip(cols, df.head(5).itertuples())):
                 with col:
-                    img_url = row.img if row.img != "No Image" and row.img else "https://via.placeholder.com/300x400.png?text=No+Image"
+                    img_url = row.img if row.img != "No Image" else "https://via.placeholder.com/300x400.png?text=No+Image"
                     st.image(img_url, use_container_width=True)
                     st.caption(f"💰 {row.price} CFA")
                     st.caption(f"📍 {row.adress[:15]}...")
     
     elif option_choice == "Download scraped data":
-        st.markdown("## 💾 Data Download Center")
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.success(f"✅ {len(available_data)} dataset(s) available for download")
+            st.success(f"✅ {len(available_data)} dataset(s) available")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
@@ -616,19 +658,18 @@ else:
                         key=f"dl_{cat_name}"
                     )
         else:
-            st.warning("⚠️ No data available. Please scrape first from the 'Scrape data using BeautifulSoup' action.")
+            st.warning("⚠️ No data available. Please scrape first.")
     
     elif option_choice == "Data Dashboard":
-        st.markdown("## 📊 Analytics Dashboard")
         available_data = [cat for cat in CATEGORIES.keys() if f'scraped_data_{cat}' in st.session_state]
         
         if available_data:
-            st.info("Charts are generated only if the dataset has at least 10 entries with valid price data.")
+            st.markdown("## 📊 Analytics Dashboard")
             
             for cat_name in available_data:
                 df = st.session_state[f'scraped_data_{cat_name}']
                 
-                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name} Analysis")
+                st.markdown(f"### {CATEGORIES[cat_name]['icon']} {cat_name}")
                 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -647,14 +688,14 @@ else:
                 if fig:
                     st.pyplot(fig)
                 else:
-                    st.warning("⚠️ Not enough clean data points (min 10) to generate charts for this category.")
+                    st.warning("⚠️ Need at least 10 items for charts")
                 
                 st.markdown("---")
         else:
-            st.warning("⚠️ No data available. Please scrape first from the 'Scrape data using BeautifulSoup' action.")
+            st.warning("⚠️ No data available. Please scrape first.")
     
     elif option_choice == "Evaluate the App":
-        st.markdown("## ⭐ Help Us Improve - Evaluation")
+        st.markdown("## ⭐ Help Us Improve")
         st.markdown("Your feedback matters! Choose your preferred platform:")
         
         col1, col2 = st.columns(2)
