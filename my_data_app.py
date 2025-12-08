@@ -26,9 +26,9 @@ Path(CSV_FOLDER).mkdir(exist_ok=True)
 
 # CSV Files Configuration (Assumes these files exist in the 'data' folder for the CSV Viewer)
 CSV_FILES = {
-    "👔 Vêtements Homme": "vetement_homme.csv",
-    "👶 Vêtements Enfant": "vetements_enfant.csv",
-    "👞 Chaussures Homme": "chaussures_hommes.csv",
+    "👔 Vêtements Homme": "vetement_hommes.csv",
+    "👶 Vêtements Enfant": "vetement_enfants.csv",
+    "👞 Chaussures Homme": "chaussure_hommes.csv",
     "👟 Chaussures Enfant": "chaussure_enfant.csv"
 }
 
@@ -988,3 +988,4 @@ elif page_selection == "📊 Scrape & Analyze":
             
         st.markdown("<br>", unsafe_allow_html=True)
         st.info("The links above open external forms to submit your evaluation.")
+
