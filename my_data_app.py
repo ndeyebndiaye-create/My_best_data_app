@@ -45,9 +45,9 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* ALL ACTION PAGES - Shopping Bags Background (OPACITY FIX) */
+    /* ALL ACTION PAGES - Shopping Bags Background (OPACITY FIX APPLIED) */
     .scraping-page, .download-page, .dashboard-page, .evaluation-page {
-        /* CHANGED OPACITY: 0.95 -> 0.98 for better readability */
+        /* CORRECTION: Opacité de l'overlay augmentée à 0.98 pour une meilleure lisibilité */
         background: linear-gradient(rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.98)),
                     url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1920&q=90');
         background-size: cover;
@@ -164,9 +164,9 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     
-    /* MAIN CONTENT CARD - Moins transparent pour une meilleure lisibilité (OPACITY FIX) */
+    /* MAIN CONTENT CARD - Moins transparent pour une meilleure lisibilité (OPACITY FIX MAINTAINED) */
     .main .block-container {
-        /* CHANGED OPACITY: 0.95 -> 0.98 */
+        /* Opacité à 0.98 pour la carte blanche centrale */
         background: rgba(255, 255, 255, 0.98); 
         border-radius: 20px;
         padding: 3rem;
