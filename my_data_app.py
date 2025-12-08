@@ -31,8 +31,8 @@ st.markdown("""
     
     /* WELCOME PAGE - Fashion Background */
     .welcome-container {
-        background: linear-gradient(135deg, rgba(26, 35, 126, 0.95), rgba(13, 71, 161, 0.9)),
-                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80');
+        background: linear-gradient(135deg, rgba(26, 35, 126, 0.88), rgba(13, 71, 161, 0.85)),
+                    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=90');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -43,6 +43,58 @@ st.markdown("""
         box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         position: relative;
         overflow: hidden;
+    }
+    
+    /* SCRAPING PAGE - Market Analysis Background */
+    .scraping-page {
+        background: linear-gradient(135deg, rgba(13, 71, 161, 0.92), rgba(21, 101, 192, 0.90)),
+                    url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1920&q=90');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: -1rem -2rem;
+        min-height: 100vh;
+    }
+    
+    /* DOWNLOAD PAGE - Data Export Background */
+    .download-page {
+        background: linear-gradient(135deg, rgba(255, 152, 0, 0.92), rgba(251, 192, 45, 0.90)),
+                    url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&q=90');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: -1rem -2rem;
+        min-height: 100vh;
+    }
+    
+    /* DASHBOARD PAGE - Analytics Background */
+    .dashboard-page {
+        background: linear-gradient(135deg, rgba(0, 137, 123, 0.92), rgba(38, 166, 154, 0.90)),
+                    url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=90');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: -1rem -2rem;
+        min-height: 100vh;
+    }
+    
+    /* EVALUATION PAGE - Feedback Background */
+    .evaluation-page {
+        background: linear-gradient(135deg, rgba(156, 39, 176, 0.92), rgba(171, 71, 188, 0.90)),
+                    url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1920&q=90');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        border-radius: 20px;
+        padding: 2rem;
+        margin: -1rem -2rem;
+        min-height: 100vh;
     }
     
     .welcome-container::before {
@@ -150,14 +202,15 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     
-    /* MAIN CONTENT CARD */
+    /* MAIN CONTENT CARD - Plus transparent pour voir le background */
     .main .block-container {
-        background: rgba(255, 255, 255, 0.98);
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
         padding: 3rem;
         margin-top: 2rem;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px);
     }
     
     /* TITLES */
@@ -550,6 +603,21 @@ if page_selection == "🏠 Welcome":
 
 else:
     cat_info = CATEGORIES[selected_category]
+    
+    # Déterminer quelle classe CSS utiliser selon l'action
+    if option_choice == "Scrape data using BeautifulSoup":
+        page_class = "scraping-page"
+    elif option_choice == "Download scraped data":
+        page_class = "download-page"
+    elif option_choice == "Data Dashboard":
+        page_class = "dashboard-page"
+    elif option_choice == "Evaluate the App":
+        page_class = "evaluation-page"
+    else:
+        page_class = "scraping-page"
+    
+    st.markdown(f'<div class="{page_class}">', unsafe_allow_html=True)
+    
     st.markdown('<h1 class="main-title animated">📈 Market Data Scraper</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Extract and analyze fashion market data from Coinafrique Senegal</p>', unsafe_allow_html=True)
     
@@ -674,3 +742,5 @@ else:
             st.link_button("📝 Google Forms", GOOGLE_FORMS_LINK, use_container_width=True)
         with col2:
             st.link_button("📋 KoboToolbox", KOBOTOOLBOX_LINK, use_container_width=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
