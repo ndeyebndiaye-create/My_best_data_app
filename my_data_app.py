@@ -32,7 +32,7 @@ st.markdown(f"""
     
     /* Background global */
     .stApp {{
-        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(250, 250, 250, 0.95)),
+        background: linear-gradient(rgba(255, 255, 255, 0.70), rgba(250, 250, 250, 0.70)),
                     url('{WARDROBE_BACKGROUND_URL}') !important;
         background-size: cover !important;
         background-position: center !important;
@@ -598,3 +598,4 @@ else:
             st.link_button("📝 Google Forms", GOOGLE_FORMS_LINK, use_container_width=True)
         with col2:
             st.link_button("📋 KoboToolbox", KOBOTOOLBOX_LINK, use_container_width=True)
+
